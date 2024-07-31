@@ -30,3 +30,5 @@
 *.exe
 *.out
 *.app
+/AudioVisualizer/.vs
+/AudioVisualizer/AudioVisualizer/x64
