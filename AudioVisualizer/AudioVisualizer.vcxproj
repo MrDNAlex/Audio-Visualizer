@@ -47,7 +47,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\CPPLibraries\libsndfile\include;..\..\DNA-CUDA-Essentials\DNA-CUDA-Essentials;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\CPPLibraries\libsndfile\include;..\..\DNA-CUDA-Essentials\DNA-CUDA-Essentials;..\AudioVisualizer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -79,11 +79,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="C:\Users\MrDNA\Downloads\Temp\FourierTransform.cu" />
-    <CudaCompile Include="kernel.cu" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="C:\Users\MrDNA\Downloads\Temp\FourierTransform.cuh" />
+    <CudaCompile Include="FourierTransform.cu" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="C:\Users\MrDNA\Downloads\Temp\Overkill.mp3" />
@@ -91,6 +87,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Users\MrDNA\Downloads\Temp\AudioVisualizer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FourierTransform.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

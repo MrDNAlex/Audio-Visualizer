@@ -6,12 +6,14 @@
 #include "MemoryManagement.cpp"
 #include <vector>
 #include <array>
+#include "FourierTransform.cuh"
 
-__global__ void DFTGPU()
+
+__global__ void DFTGPU(std::vector<float>* fft_input, std::vector<std::array<float, 2>>* fft_output, int* d_N)
 {
+	int N = *d_N;
 
 }
-
 
 cudaError_t FourierTransform(std::vector<float> h_input, std::vector<std::array<float, 2>> h_output, int N)
 {
@@ -20,7 +22,6 @@ cudaError_t FourierTransform(std::vector<float> h_input, std::vector<std::array<
     int* d_N;
 
     cudaError_t cudaStatus;
-
 
     cudaStatus = cudaSetDevice(0);
 
@@ -31,7 +32,7 @@ cudaError_t FourierTransform(std::vector<float> h_input, std::vector<std::array<
     int threads = 1024;
     int blocks = (h_input.size() / 1024) + 1;
 
-    DFTGPU << <blocks, threads >> > ();
+    DFTGPU << <blocks, threads >> > (d_input, d_output, d_N);
 
     cudaStatus = GetVariable((void**)&h_output, d_output, sizeof(std::vector<std::array<float, 2>>), h_output.size());
 
