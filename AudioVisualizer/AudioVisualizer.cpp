@@ -12,7 +12,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 //#include "FourierTransform.cuh"
-#include "SongProcessing.h"
+#include "SongProcessing.cpp"
 
 int main()
 {
@@ -25,7 +25,7 @@ int main()
 
 	song.DebugInfo();
 
-	song.ProcessSignal();
+	//song.ProcessSignal();
 
 	////std::vector<std::vector<float>> frames = FrameAudio(buffer, fps, fft_size, sampleRate, info.channels);
 
@@ -49,7 +49,7 @@ int main()
 	//std::cout << "Exracted Nyquist DFT" << std::endl;
 
 
-	
+
 }
 
 

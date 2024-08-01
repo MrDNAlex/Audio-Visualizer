@@ -1,18 +1,19 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "MemoryManagement.cpp"
-#include <stdio.h>
+//#include "FourierTransform.cuh"
 
-__global__ void DFTGPU(float* input, float* output, int* fft_size, int* numOfFrames)
+
+__global__ void DFTGPU(float* input, float* output, int fft_size, int numOfFrames)
 {
-	int fftSize = *fft_size;
-	int frames = *numOfFrames;
+	//int fftSize = *fft_size;
+	//int frames = *numOfFrames;
 
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
 
-	int N = fftSize;
+	int N = fft_size;
 
-	int outputIndex = fftSize * index;
+	int outputIndex = fft_size * index;
 
 	float pi = 3.14159265358979323846;
 
@@ -51,8 +52,8 @@ cudaError_t FourierTransform(float* input, float* output, int fft_size, int numO
 {
 	float* kernel_input = 0;
 	float* kernel_output = 0;
-	int* kernel_fft_size = 0;
-	int* kernel_numOfFrames = 0;
+	int kernel_fft_size = 0;
+	int kernel_numOfFrames = 0;
 
 	cudaError_t cudaStatus;
 	cudaStatus = cudaSetDevice(0);
@@ -67,6 +68,8 @@ cudaError_t FourierTransform(float* input, float* output, int fft_size, int numO
 	int blocks = (numOfFrames / 1024) + 1;
 
 	DFTGPU << <blocks, threads >> > (kernel_input, kernel_output, kernel_fft_size, kernel_numOfFrames);
+
+	cudaStatus = cudaDeviceSynchronize();
 
 	cudaStatus = GetVariable((void**)&output, kernel_output, sizeof(float), fft_size * numOfFrames);
 

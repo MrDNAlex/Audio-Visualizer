@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FOURIERTRANSFORM_H
 #define FOURIERTRANSFORM_H
 
@@ -5,7 +6,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <iostream>
-#include <stdio.h>
+//#include <stdio.h>
 #include <math.h>
 #include <vector>
 #include <array>
