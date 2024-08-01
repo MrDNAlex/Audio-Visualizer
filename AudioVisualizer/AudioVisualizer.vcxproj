@@ -57,6 +57,8 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <Keep>true</Keep>
+      <NvccCompilation>cubin</NvccCompilation>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,14 +84,12 @@
     <CudaCompile Include="FourierTransform.cu" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="C:\Users\MrDNA\Downloads\Temp\Overkill.mp3" />
-    <Media Include="C:\Users\MrDNA\Downloads\Temp\Overkill.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="C:\Users\MrDNA\Downloads\Temp\AudioVisualizer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="FourierTransform.cuh" />
+    <ClInclude Include="SongProcessing.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioVisualizer.cpp" />
+    <ClCompile Include="SongProcessing.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

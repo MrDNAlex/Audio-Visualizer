@@ -10,8 +10,8 @@
 #include <vector>
 #include <array>
 
-__global__ void DFTGPU(std::vector<float>* fft_input, std::vector<std::array<float, 2>>* fft_output, int* d_N);
+__global__ void DFTGPU(float* input, float* output, int* fft_size, int* numOfFrames);
 
-cudaError_t FourierTransform(std::vector<float> h_input, std::vector<std::array<float, 2>> h_output, int N);
+cudaError_t FourierTransform(float* input, float* output, int fft_size, int numOfFrames);
 
 #endif // FOURIERTRANSFORM_H
