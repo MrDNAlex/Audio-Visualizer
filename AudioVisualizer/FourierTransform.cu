@@ -1,6 +1,8 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "MemoryManagement.cpp"
+#include "FourierTransform.cuh"
+#include <iostream>
 //#include "FourierTransform.cuh"
 
 
@@ -50,6 +52,8 @@ __global__ void DFTGPU(float* input, float* output, int fft_size, int numOfFrame
 
 cudaError_t FourierTransform(float* input, float* output, int fft_size, int numOfFrames)
 {
+	std::cout << "FourierTransform" << std::endl;
+
 	float* kernel_input = 0;
 	float* kernel_output = 0;
 	int kernel_fft_size = 0;

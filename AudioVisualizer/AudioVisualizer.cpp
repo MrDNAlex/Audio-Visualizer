@@ -21,6 +21,8 @@ int main()
 
 	SongProcessing song = SongProcessing("Overkill.wav", fps, fft_size);
 
+	song.ProcessSignal();
+
 	std::cout << "Framing Audio..." << std::endl;
 
 	song.DebugInfo();

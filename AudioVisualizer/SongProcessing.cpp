@@ -7,7 +7,7 @@
 #include <chrono>
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-//#include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\kernel.cu"
+#include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\FourierTransform.cuh"
 
 
 class SongProcessing
@@ -27,8 +27,6 @@ public:
 	float* processedSignal;
 
 	int signalLength;
-
-
 
 
 	//Audio file properties
@@ -76,7 +74,7 @@ public:
 
 	void ProcessSignal()
 	{
-		//FourierTransform(signal, processedSignal, fft_size, numFrames);
+		FourierTransform(signal, processedSignal, fft_size, numFrames);
 
 	}
 
