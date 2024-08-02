@@ -56,12 +56,12 @@ public:
 			std::cerr << "Error opening file." << std::endl;
 		}
 
-		sf_count_t num_frames = sf_readf_short(file, audioBuffer.data(), info.frames);
-
+		this->audioBuffer = std::vector<short>(info.frames * info.channels);
 		this->sample_rate = info.samplerate;
 		this->audioFrames = info.frames;
 		this->channels = info.channels;
-		this->audioBuffer = std::vector<short>(info.frames * info.channels);
+
+		sf_count_t num_frames = sf_readf_short(file, audioBuffer.data(), info.frames);
 
 		numFrames = GetNumOfFrames(audioBuffer, fps, fft_size, sample_rate, channels);
 
@@ -74,8 +74,64 @@ public:
 
 	void ProcessSignal()
 	{
-		FourierTransform(signal, processedSignal, fft_size, numFrames);
+		float* signal_real = new float[fft_size * numFrames];
+		float* signal_imag = new float[fft_size * numFrames];
 
+		FourierTransform(signal, signal_real, signal_imag, fft_size, numFrames);
+
+		std::vector<std::vector<std::array<float, 2>>> nyquist;
+
+		for (int i = 0; i < numFrames; i++) {
+
+			std::vector<std::array<float, 2>> frame;
+
+			for (int j = 0; j < fft_size / 2; j++) {
+				int index = i * fft_size + j;
+				frame.push_back({ signal_real[index], signal_imag[index] });
+			}
+			nyquist.push_back(frame);
+		}
+
+		std::vector<std::vector<std::array<float, 2>>> classic = oldMethod();
+
+		std::cout << "Comparing Nyquist and Classic DFT..." << std::endl;
+
+		for (int i = 0; i < numFrames; i++)
+		{
+			for (int j = 0; j < nyquist[i].size(); j++)
+			{
+				std::cout << "Real: " << nyquist[i][j][0] - classic[i][j][0] << " Imag: " << nyquist[i][j][1] - classic[i][j][1] << std::endl;
+
+			}
+		}
+	}
+
+	std::vector<std::vector<std::array<float, 2>>> oldMethod()
+	{
+		std::vector<std::vector<float>> frames = FrameAudio(audioBuffer, fps, fft_size, sample_rate, info.channels);
+		std::vector<std::vector<std::array<float, 2>>> dft_frames = DFTFrames(frames);
+		std::vector<std::vector<std::array<float, 2>>> dft_frames_nyquist = ExtractNyquist(dft_frames);
+
+		std::cout << "Classic DFT Calculated." << std::endl;
+
+		return dft_frames_nyquist;
+	}
+
+	std::vector<std::vector<std::array<float, 2>>> ExtractNyquist(std::vector<std::vector<std::array<float, 2>>> dft_frames)
+	{
+		std::vector<std::vector<std::array<float, 2>>> dft_frames_nyquist;
+
+		std::cout << "Extracting Nyquist DFT..." << std::endl;
+		for (int i = 0; i < dft_frames.size(); i++) {
+			std::vector<std::array<float, 2>> dft_frame_nyquist;
+			for (int j = 0; j < (dft_frames[i].size() / 2) + 1; j++) {
+				dft_frame_nyquist.push_back(dft_frames[i][j]);
+			}
+			dft_frames_nyquist.push_back(dft_frame_nyquist);
+		}
+		std::cout << "Exracted Nyquist DFT" << std::endl;
+
+		return dft_frames_nyquist;
 	}
 
 	void ExtractSignal(std::vector<short> audioSignal, int fps = 24, int fft_size = 2048, int sample_rate = 22050, int channels = 1)
@@ -111,13 +167,12 @@ public:
 		std::cout << "Channels: " << info.channels << std::endl;
 		std::cout << "Duration: " << static_cast<double>(numFrames) / info.samplerate << " seconds." << std::endl;
 		std::cout << "Buffer Size: " << audioBuffer.size() << std::endl;
-
 	}
-
-
 
 	std::vector<std::vector<float>> FrameAudio(std::vector<short> audioSignal, int fps = 24, int fft_size = 2048, int sample_rate = 22050, int channels = 1)
 	{
+		std::cout << "Framing Audio..." << std::endl;
+
 		std::vector<std::vector<float>> frames;
 
 		int frameSize = (sample_rate * channels) / fps; // This calculates how many samples per frame based on fps
@@ -133,6 +188,8 @@ public:
 			}
 			frames.push_back(frame);
 		}
+
+		std::cout << "Audio Framed." << std::endl;
 
 		return frames;
 	}
@@ -166,7 +223,6 @@ public:
 		}
 
 		//Compute Even signals
-
 		std::vector<float> frame_even;
 		std::vector<float> frame_odd;
 
@@ -212,10 +268,9 @@ public:
 		std::cout << "Calculating DFT..." << std::endl;
 
 		for (int i = 0; i < frames.size(); i++) {
-			if (i % 20 == 0) {
+			if (i % 100 == 0) {
 				std::cout << ((float)i) / ((float)frames.size()) << "% Complete" << std::endl;
 			}
-
 			dft_frames.push_back(FFT(frames[i]));
 		}
 

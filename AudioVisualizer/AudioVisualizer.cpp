@@ -1,6 +1,5 @@
 // AudioVisualizer.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
 #include <iostream>
 #include <sndfile.h>
 #include <vector>
@@ -11,7 +10,6 @@
 #include "device_launch_parameters.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-//#include "FourierTransform.cuh"
 #include "SongProcessing.cpp"
 
 int main()
@@ -21,42 +19,11 @@ int main()
 
 	SongProcessing song = SongProcessing("Overkill.wav", fps, fft_size);
 
-	song.ProcessSignal();
-
-	std::cout << "Framing Audio..." << std::endl;
-
 	song.DebugInfo();
 
-	//song.ProcessSignal();
-
-	////std::vector<std::vector<float>> frames = FrameAudio(buffer, fps, fft_size, sampleRate, info.channels);
-
-	//std::cout << "Audio Framed." << std::endl;
-
-
-	//std::vector<std::vector<std::array<float, 2>>> dft_frames = DFTFrames(frames);
-
-	//std::vector<std::vector<std::array<float, 2>>> dft_frames_nyquist;
-
-	//std::cout << "Extracting Nyquist DFT..." << std::endl;
-
-	//for (int i = 0; i < dft_frames.size(); i++) {
-	//	std::vector<std::array<float, 2>> dft_frame_nyquist;
-	//	for (int j = 0; j < (dft_frames[i].size() / 2) + 1; j++) {
-	//		dft_frame_nyquist.push_back(dft_frames[i][j]);
-	//	}
-	//	dft_frames_nyquist.push_back(dft_frame_nyquist);
-	//}
-
-	//std::cout << "Exracted Nyquist DFT" << std::endl;
-
-
+	song.ProcessSignal();
 
 }
-
-
-
-
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu

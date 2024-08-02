@@ -11,8 +11,8 @@
 #include <vector>
 #include <array>
 
-__global__ void DFTGPU(float* input, float* output, int* fft_size, int* numOfFrames);
+__global__ void DFTGPU(float* input, float* output_real, float* output_imag, int* fft_size, int* numOfFrames);
 
-cudaError_t FourierTransform(float* input, float* output, int fft_size, int numOfFrames);
+cudaError_t FourierTransform(float* input, float* output_real, float* output_imag, int fft_size, int numOfFrames);
 
 #endif // FOURIERTRANSFORM_H
