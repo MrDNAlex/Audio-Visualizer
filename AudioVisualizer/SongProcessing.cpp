@@ -72,38 +72,168 @@ public:
 		sf_close(file);
 	}
 
+	std::vector<float> linspace(float start, float stop, int num) {
+		std::vector<float> result;
+		float step = (stop - start) / (num - 1);
+
+		for (int i = 0; i < num; ++i) {
+			result.push_back(start + i * step);
+		}
+
+		return result;
+	}
+
+	std::vector<float> logspace(float start, float stop, int num) {
+		std::vector<float> result;
+		std::vector<float> lin_space = linspace(start, stop, num);
+
+		for (double v : lin_space) {
+			result.push_back(pow(10, v));
+		}
+
+		return result;
+	}
+
+	int binarySearch(std::vector<float> list, float item)
+	{
+		int low = 0;
+		int high = list.size() - 1;
+
+		while (low != (high + 1))
+		{
+			int middle = (low + high) / 2;
+
+			if (list[middle] == item)
+			{
+				return middle;
+			}
+			else if (list[middle] < item)
+			{
+				low = middle + 1;
+			}
+			else
+			{
+				high = middle - 1;
+			}
+		}
+
+		if (0 <= low && low < list.size())
+		{
+			return low;
+		}
+	}
+
+	float GetMax(std::vector<float> vector)
+	{
+		float max = 0;
+
+		for (int i = 0; i < vector.size(); i++)
+		{
+			if (vector[i] > max)
+				max = vector[i];
+		}
+
+		return max;
+	}
+
+	std::vector<float> Normalize(std::vector<float> vector)
+	{
+		float max = GetMax(vector);
+		//std::vector<float> vec = *vector;
+
+		if (max == 0)
+			max = 0.0001;
+
+		for (int i = 0; i < vector.size(); i++)
+			vector[i] = vector[i] / max;
+
+		return vector;
+	}
+
 	void ProcessSignal()
 	{
-		/*float* signal_real = new float[fft_size * numFrames];
-		float* signal_imag = new float[fft_size * numFrames];*/
-		FourierData* data = new FourierData[fft_size * numFrames];
+		int bands = 60;
+		float* data = new float[fft_size * numFrames];
 
-		FourierTransform(signal, data, fft_size, numFrames);
+		FourierTransformMagnitude(signal, data, fft_size, numFrames);
 
-		std::vector<std::vector<std::array<float, 2>>> nyquist;
+		std::vector<std::vector<float>> nyquistMag;
 
 		for (int i = 0; i < numFrames; i++) {
-
-			std::vector<std::array<float, 2>> frame;
+			std::vector<float> frame;
 
 			for (int j = 0; j < fft_size / 2; j++) {
 				int index = i * fft_size + j;
-				frame.push_back({ data[index].real, data[index].imag });
+				frame.push_back(data[index]);
 			}
-			nyquist.push_back(frame);
+			nyquistMag.push_back(frame);
 		}
 
-		std::vector<std::vector<std::array<float, 2>>> classic = oldMethod();
+		std::vector<float> freqBins(nyquistMag[0].size());
 
-		std::cout << "Comparing Nyquist and Classic DFT..." << std::endl;
+		for (int i = 0; i < fft_size / 2; i++) {
+			freqBins[i] = (float)i * sample_rate / fft_size;
+		}
 
-		for (int i = 0; i < numFrames; i++)
-		{
-			for (int j = 0; j < nyquist[i].size(); j++)
+		float start = 0;
+		float stop = log10(freqBins[(fft_size / 2) - 1]);
+
+		std::vector<float> logFreqs = logspace(start, stop, bands + 1);
+
+		std::vector<std::vector<float>> bandData(nyquistMag.size());
+
+		for (int i = 0; i < nyquistMag.size(); i++) {
+
+			std::vector<float> band(bands);
+			for (int j = 0; j < bands; j++)
 			{
-				std::cout << "Real: " << nyquist[i][j][0] - classic[i][j][0] << " Imag: " << nyquist[i][j][1] - classic[i][j][1] << std::endl;
+				int startIndex = binarySearch(freqBins, logFreqs[j]);
+				int endIndex = binarySearch(freqBins, logFreqs[j + 1]);
+
+				int delta = endIndex - startIndex;
+
+				if (delta > 0)
+				{
+					float sum = 0;
+					for (int k = startIndex; k <= endIndex; k++)
+					{
+						sum += nyquistMag[i][k];
+					}
+
+					band[j] = (sum / (float)delta);
+				}
+				else
+				{
+					band[j] = 0;
+				}
 			}
+
+			std::vector<float> vec = Normalize(band);
+
+			bandData[i] = vec;
 		}
+
+		int hello = 0;
+
+
+
+
+		//std::vector<std::vector<std::array<float, 2>>> classic = oldMethod();
+
+		//std::cout << "Comparing Nyquist and Classic DFT..." << std::endl;
+
+		//for (int i = 0; i < numFrames; i++)
+		//{
+		//	for (int j = 0; j < nyquistMag[i].size(); j++)
+		//	{
+		//		float mag = sqrtf(classic[i][j][0] * classic[i][j][0] + classic[i][j][1] * classic[i][j][1]);
+
+		//		std::cout << "Mags: " << nyquistMag[i][j] - mag << std::endl;
+
+
+		//		//std::cout << "Real: " << nyquistMag[i][j] - classic[i][j][0] << " Imag: " << nyquist[i][j][1] - classic[i][j][1] << std::endl;
+		//	}
+		//}
 	}
 
 	std::vector<std::vector<std::array<float, 2>>> oldMethod()
@@ -244,7 +374,7 @@ public:
 			float angle = -2 * pi * k / N;
 			float real_odd = cosf(angle) * odd[k][0] + sinf(angle) * odd[k][1];
 			float imag_odd = -sinf(angle) * odd[k][0] + cosf(angle) * odd[k][1];
-				
+
 			real[k] = even[k][0] + real_odd;
 			imag[k] = even[k][1] + imag_odd;
 

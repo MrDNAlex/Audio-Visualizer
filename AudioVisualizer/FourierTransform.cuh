@@ -15,7 +15,11 @@ struct FourierData {
 	float imag;
 };
 
+__global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int* numOfFrames);
+
 __global__ void DFTGPU(float* input, FourierData* output, int* fft_size, int* numOfFrames);
+
+cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size, int numOfFrames);
 
 cudaError_t FourierTransform(float* input, FourierData* output, int fft_size, int numOfFrames);
 
