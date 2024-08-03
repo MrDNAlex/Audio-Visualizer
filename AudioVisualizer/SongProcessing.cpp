@@ -239,8 +239,8 @@ public:
 
 		for (int k = 0; k < N / 2; k++) {
 			float angle = -2 * 3.141 * k / N;
-			float real_odd = cosf(angle) * odd[k][0] - sinf(angle) * odd[k][1];
-			float imag_odd = sinf(angle) * odd[k][0] + cosf(angle) * odd[k][1];
+			float real_odd = cosf(angle) * odd[k][0] + sinf(angle) * odd[k][1];
+			float imag_odd = -sinf(angle) * odd[k][0] + cosf(angle) * odd[k][1];
 
 			real[k] = even[k][0] + real_odd;
 			imag[k] = even[k][1] + imag_odd;
