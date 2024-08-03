@@ -213,11 +213,6 @@ public:
 			bandData[i] = vec;
 		}
 
-		int hello = 0;
-
-
-
-
 		//std::vector<std::vector<std::array<float, 2>>> classic = oldMethod();
 
 		//std::cout << "Comparing Nyquist and Classic DFT..." << std::endl;
