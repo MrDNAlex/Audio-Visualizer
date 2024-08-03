@@ -63,6 +63,9 @@
       <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
       <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
     </CudaCompile>
+    <PreBuildEvent>
+      <Command>del "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -85,6 +88,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="FourierTransform.cu" />
+    <CudaCompile Include="Garbage.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioVisualizer.cpp" />

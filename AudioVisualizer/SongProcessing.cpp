@@ -74,10 +74,11 @@ public:
 
 	void ProcessSignal()
 	{
-		float* signal_real = new float[fft_size * numFrames];
-		float* signal_imag = new float[fft_size * numFrames];
+		/*float* signal_real = new float[fft_size * numFrames];
+		float* signal_imag = new float[fft_size * numFrames];*/
+		FourierData* data = new FourierData[fft_size * numFrames];
 
-		FourierTransform(signal, signal_real, signal_imag, fft_size, numFrames);
+		FourierTransform(signal, data, fft_size, numFrames);
 
 		std::vector<std::vector<std::array<float, 2>>> nyquist;
 
@@ -87,7 +88,7 @@ public:
 
 			for (int j = 0; j < fft_size / 2; j++) {
 				int index = i * fft_size + j;
-				frame.push_back({ signal_real[index], signal_imag[index] });
+				frame.push_back({ data[index].real, data[index].imag });
 			}
 			nyquist.push_back(frame);
 		}
@@ -101,7 +102,6 @@ public:
 			for (int j = 0; j < nyquist[i].size(); j++)
 			{
 				std::cout << "Real: " << nyquist[i][j][0] - classic[i][j][0] << " Imag: " << nyquist[i][j][1] - classic[i][j][1] << std::endl;
-
 			}
 		}
 	}
@@ -216,6 +216,9 @@ public:
 
 	std::vector<std::array<float, 2>> FFT(std::vector<float> frame)
 	{
+
+		const float pi = 3.14159265358979323846;
+
 		int N = frame.size();
 
 		if (N <= 1) {
@@ -238,10 +241,10 @@ public:
 		std::vector<float> imag(N);
 
 		for (int k = 0; k < N / 2; k++) {
-			float angle = -2 * 3.141 * k / N;
+			float angle = -2 * pi * k / N;
 			float real_odd = cosf(angle) * odd[k][0] + sinf(angle) * odd[k][1];
 			float imag_odd = -sinf(angle) * odd[k][0] + cosf(angle) * odd[k][1];
-
+				
 			real[k] = even[k][0] + real_odd;
 			imag[k] = even[k][1] + imag_odd;
 
