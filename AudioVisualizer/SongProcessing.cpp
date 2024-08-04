@@ -8,6 +8,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\FourierTransform.cuh"
+#include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\Convolution.cuh"
 
 
 class SongProcessing
@@ -212,6 +213,31 @@ public:
 
 			bandData[i] = vec;
 		}
+
+
+		int inputSize = 10;
+		int kernelSize = 3;
+		int stepSize = 1;
+		int outputSize = GetConvolutionOutputSize(inputSize, kernelSize, stepSize);
+
+
+		float* testSignal = new float[inputSize] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+		float* testKernel = new float[kernelSize] {1, 0, -1};
+
+		float* output = new float[outputSize];
+
+
+		Convolution(testSignal, testKernel, output, inputSize, kernelSize, stepSize, outputSize);
+
+		for (int i = 0; i < outputSize; i++)
+		{
+			std::cout << output[i] << std::endl;
+		}
+
+
+		int hello = 0;
+
+
 
 		//std::vector<std::vector<std::array<float, 2>>> classic = oldMethod();
 

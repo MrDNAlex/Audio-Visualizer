@@ -1,6 +1,6 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "MemoryManagement.cpp"
+#include "MemoryManagement.h"
 #include "FourierTransform.cuh"
 #include <iostream>
 #include <chrono>

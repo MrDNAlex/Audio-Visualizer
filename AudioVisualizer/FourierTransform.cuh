@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FOURIERTRANSFORM_H
-#define FOURIERTRANSFORM_H
+//#ifndef FOURIERTRANSFORM_H
+//#define FOURIERTRANSFORM_H
 
 // CUDA Runtime
 #include "cuda_runtime.h"
@@ -23,4 +23,4 @@ cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size,
 
 cudaError_t FourierTransform(float* input, FourierData* output, int fft_size, int numOfFrames);
 
-#endif // FOURIERTRANSFORM_H
+//#endif // FOURIERTRANSFORM_H
