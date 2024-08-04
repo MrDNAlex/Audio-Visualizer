@@ -3,6 +3,11 @@
 #include "device_launch_parameters.h"
 #include "MemoryManagement.h"
 
+int GetConvolutionOutputSize(int arraySize, int kernelSize, int stepSize)
+{
+	return ((arraySize - kernelSize) / stepSize) + 1;
+}
+
 __global__ void ConvolutionGPU(float* input, float* kernel, float* output, int* arraySize, int* kernelSize, int* step, int* outputSize)
 {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -26,19 +31,7 @@ __global__ void ConvolutionGPU(float* input, float* kernel, float* output, int* 
 		sum += input[inputIndex] * kernel[kernelIndex];
 	}
 
-
-	/*for (int i = 0; i < K; i++)
-	{
-		if (startIndex + i >= N) break;
-		sum += input[startIndex + i] * kernel[i];
-	}*/
-
 	output[index] = sum;
-}
-
-int GetConvolutionOutputSize(int arraySize, int kernelSize, int stepSize)
-{
-	return ((arraySize - kernelSize) / stepSize) + 1;
 }
 
 cudaError_t Convolution(float* input, float* kernel, float* output, int arraySize, int kernelSize, int stepSize, int outputSize)

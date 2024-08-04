@@ -16,6 +16,8 @@ cudaError_t Convolution(float* input, float* kernel, float* output, int arraySiz
 
 int GetConvolutionOutputSize(int arraySize, int kernelSize, int stepSize);
 
+int Get2DConvolutionOutputSize(int arraySizeX, int arraySizeY, int kernelSizeX, int kernelSizeY, int stepSizeX, int stepSizeY);
+
 
 
 //__global__ void Convolution2DGPU(float* input, float* kernel, float* output, int* kernel_size, int* signal_size);
