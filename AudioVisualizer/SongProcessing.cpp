@@ -214,31 +214,6 @@ public:
 			bandData[i] = vec;
 		}
 
-
-		/*int inputSize = 10;
-		int kernelSize = 3;
-		int stepSize = 1;
-		int outputSize = GetConvolutionOutputSize(inputSize, kernelSize, stepSize);
-
-
-		float* testSignal = new float[inputSize] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-		float* testKernel = new float[kernelSize] {1, 0, -1};
-
-		float* output = new float[outputSize];
-
-
-		Convolution(testSignal, testKernel, output, inputSize, kernelSize, stepSize, outputSize);
-
-		for (int i = 0; i < outputSize; i++)
-		{
-			std::cout << output[i] << std::endl;
-		}
-
-
-		int hello = 0;*/
-
-		//Convolve over Bands
-
 		int inputHeight = bandData.size();
 		int inputWidth = bands;
 
@@ -286,6 +261,11 @@ public:
 		}
 
 		//Should be good Now, just gotta figure out how to visualize it
+
+		delete[] data;
+		delete[] output;
+		delete[] kernel;
+		delete[] input;
 
 	}
 
