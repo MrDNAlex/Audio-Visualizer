@@ -2,6 +2,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "MemoryManagement.h"
+#include "lodepng.h"
 
 int GetConvolutionOutputSize(int width, int kernelSize, int stepSize)
 {
@@ -174,4 +175,44 @@ cudaError_t Convolution2D(float* input, float* kernel, float* output, int inputW
 	cudaFree(gpuOutputHeight);
 
 	return cudaStatus;
+}
+
+__global__ void drawKernel(unsigned char* img, int width, int height) {
+	int x = blockIdx.x * blockDim.x + threadIdx.x;
+	int y = blockIdx.y * blockDim.y + threadIdx.y;
+	if (x < width && y < height) {
+		int offset = (y * width + x) * 4;
+		img[offset] = x % 256;  // Red channel example
+		img[offset + 1] = y % 256; // Green channel example
+		img[offset + 2] = 128; // Blue channel static example
+		img[offset + 3] = 255; // Alpha channel
+	}
+}
+
+void DrawImage(int index) {
+	int width = 1024;
+	int height = 1024;
+	size_t img_size = width * height * 4;
+	unsigned char* d_img, * h_img;
+
+	cudaMalloc(&d_img, img_size);
+	h_img = (unsigned char*)malloc(img_size);
+
+	dim3 blockSize(16, 16);
+	dim3 numBlocks((width + blockSize.x - 1) / blockSize.x,
+		(height + blockSize.y - 1) / blockSize.y);
+	drawKernel << <numBlocks, blockSize >> > (d_img, width, height);
+	cudaMemcpy(h_img, d_img, img_size, cudaMemcpyDeviceToHost);
+
+	char filename[100];
+
+	// Format the filename with the index
+	sprintf(filename, "C:\\Users\\MrDNA\\Downloads\\test\\output%d.png", index);
+	
+	// Save to PNG using lodepng
+	unsigned error = lodepng_encode32_file(filename, h_img, width, height);
+	if (error) printf("Error %u: %s\n", error, lodepng_error_text(error));
+
+	cudaFree(d_img);
+	free(h_img);
 }

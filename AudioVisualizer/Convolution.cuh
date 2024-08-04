@@ -25,4 +25,6 @@ __global__ void Convolution2DGPU(float* input, float* kernel, float* output, int
 
 cudaError_t Convolution2D(float* input, float* kernel, float* output, int inputWidth, int inputHeight, int kernelWidth, int kernelHeight, int stepWidth, int stepHeight, int outputWidth, int outputHeight);
 
+void DrawImage(int index);
+
 //#endif // CONVOLUTION_H
