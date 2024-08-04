@@ -215,7 +215,7 @@ public:
 		}
 
 
-		int inputSize = 10;
+		/*int inputSize = 10;
 		int kernelSize = 3;
 		int stepSize = 1;
 		int outputSize = GetConvolutionOutputSize(inputSize, kernelSize, stepSize);
@@ -235,7 +235,28 @@ public:
 		}
 
 
-		int hello = 0;
+		int hello = 0;*/
+
+		int inputWidth = 5;
+		int inputHeight = 5;
+		int kernelWidth = 3;
+		int kernelHeight = 3;
+		int stepWidth = 1;
+		int stepHeight = 1;
+		int outputWidth = GetConvolutionOutputSize(inputWidth, kernelWidth, stepWidth);
+		int outputHeight = GetConvolutionOutputSize(inputHeight, kernelHeight, stepHeight);
+
+		float* testSignal = new float[inputWidth * inputHeight] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4};
+		float* testKernel = new float[kernelWidth * kernelHeight] {1, 0, -1, 1, 0, -1, 1, 0, -1};
+
+		float* output = new float[outputWidth * outputHeight];
+
+		Convolution2D(testSignal, testKernel, output, inputWidth, inputHeight, kernelWidth, kernelHeight, stepWidth, stepHeight, outputWidth, outputHeight);
+
+		for (int i = 0; i < outputWidth * outputHeight; i++)
+		{
+			std::cout << output[i] << std::endl;
+		}
 
 
 

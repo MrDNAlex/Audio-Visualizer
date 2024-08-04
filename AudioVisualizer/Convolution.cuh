@@ -14,14 +14,15 @@ __global__ void ConvolutionGPU(float* input, float* kernel, float* output, int* 
 
 cudaError_t Convolution(float* input, float* kernel, float* output, int arraySize, int kernelSize, int stepSize, int outputSize);
 
-int GetConvolutionOutputSize(int arraySize, int kernelSize, int stepSize);
+int GetConvolutionOutputSize(int width, int kernelSize, int stepSize);
 
 int Get2DConvolutionOutputSize(int arraySizeX, int arraySizeY, int kernelSizeX, int kernelSizeY, int stepSizeX, int stepSizeY);
 
+std::pair<int, int> GetConvolutionOutputSize2D(int width, int height, int kernelWidth, int kernelHeight, int stepWidth, int stepHeight);
 
 
-//__global__ void Convolution2DGPU(float* input, float* kernel, float* output, int* kernel_size, int* signal_size);
+__global__ void Convolution2DGPU(float* input, float* kernel, float* output, int* inputWidth, int* inputHeight, int* kernelWidth, int* kernelHeight, int* step, int* outputWidth, int* outputHeight);
 
-//cudaError_t Convolution2D(float* input, float* kernel, float* output, int kernel_size, int signal_size);
+cudaError_t Convolution2D(float* input, float* kernel, float* output, int inputWidth, int inputHeight, int kernelWidth, int kernelHeight, int stepWidth, int stepHeight, int outputWidth, int outputHeight);
 
 //#endif // CONVOLUTION_H
