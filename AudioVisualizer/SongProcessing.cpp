@@ -267,14 +267,10 @@ public:
 		delete[] kernel;
 		delete[] input;
 
-
 		for (int i = 0; i < 100; i++)
 		{
 			DrawImage(i);
 		}
-
-		
-
 	}
 
 	std::vector<std::vector<std::array<float, 2>>> oldMethod()
