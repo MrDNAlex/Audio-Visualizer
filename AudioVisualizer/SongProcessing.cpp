@@ -237,45 +237,56 @@ public:
 
 		int hello = 0;*/
 
-		int inputWidth = 5;
-		int inputHeight = 5;
+		//Convolve over Bands
+
+		int inputHeight = bandData.size();
+		int inputWidth = bands;
+
 		int kernelWidth = 3;
 		int kernelHeight = 3;
+
+		int kernelSize = kernelWidth * kernelHeight;
+
 		int stepWidth = 1;
 		int stepHeight = 1;
+
 		int outputWidth = GetConvolutionOutputSize(inputWidth, kernelWidth, stepWidth);
 		int outputHeight = GetConvolutionOutputSize(inputHeight, kernelHeight, stepHeight);
 
-		float* testSignal = new float[inputWidth * inputHeight] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4};
-		float* testKernel = new float[kernelWidth * kernelHeight] {1, 0, -1, 1, 0, -1, 1, 0, -1};
-
 		float* output = new float[outputWidth * outputHeight];
 
-		Convolution2D(testSignal, testKernel, output, inputWidth, inputHeight, kernelWidth, kernelHeight, stepWidth, stepHeight, outputWidth, outputHeight);
-
-		for (int i = 0; i < outputWidth * outputHeight; i++)
+		float* kernel = new float[kernelSize];
+		for (int i = 0; i < kernelSize; i++)
 		{
-			std::cout << output[i] << std::endl;
+			kernel[i] = 1.0f / (float)kernelSize;
 		}
 
+		float* input = new float[inputWidth * inputHeight];
 
+		for (int i = 0; i < inputHeight; i++)
+		{
+			for (int j = 0; j < inputWidth; j++)
+			{
+				input[i * inputWidth + j] = bandData[i][j];
+			}
+		}
 
-		//std::vector<std::vector<std::array<float, 2>>> classic = oldMethod();
+		Convolution2D(input, kernel, output, inputWidth, inputHeight, kernelWidth, kernelHeight, stepWidth, stepHeight, outputWidth, outputHeight);
 
-		//std::cout << "Comparing Nyquist and Classic DFT..." << std::endl;
+		std::vector<std::vector<float>> convolvedBands;
 
-		//for (int i = 0; i < numFrames; i++)
-		//{
-		//	for (int j = 0; j < nyquistMag[i].size(); j++)
-		//	{
-		//		float mag = sqrtf(classic[i][j][0] * classic[i][j][0] + classic[i][j][1] * classic[i][j][1]);
+		for (int i = 0; i < outputHeight; i++)
+		{
+			std::vector<float> band;
+			for (int j = 0; j < outputWidth; j++)
+			{
+				band.push_back(output[i * outputWidth + j]);
+			}
+			convolvedBands.push_back(band);
+		}
 
-		//		std::cout << "Mags: " << nyquistMag[i][j] - mag << std::endl;
+		//Should be good Now, just gotta figure out how to visualize it
 
-
-		//		//std::cout << "Real: " << nyquistMag[i][j] - classic[i][j][0] << " Imag: " << nyquist[i][j][1] - classic[i][j][1] << std::endl;
-		//	}
-		//}
 	}
 
 	std::vector<std::vector<std::array<float, 2>>> oldMethod()

@@ -99,7 +99,6 @@ __global__ void Convolution2DGPU(float* input, float* kernel, float* output, int
 
 	float sum = 0.0f;
 
-	// Starting point of the kernel top left corner overlay with input
 	int startRow = row * SHeight;
 	int startCol = col * SWidth;
 
@@ -108,10 +107,8 @@ __global__ void Convolution2DGPU(float* input, float* kernel, float* output, int
 			int rowIndex = startRow + i;
 			int colIndex = startCol + j;
 
-			// Check bounds for the input array
 			if (rowIndex >= *inputHeight || colIndex >= *inputWidth) continue;
 
-			// Find index in input and kernel
 			int inputIndex = rowIndex * *inputWidth + colIndex;
 			int kernelIndex = (KHeight - 1 - i) * KWidth + (KWidth - 1 - j);
 
@@ -119,7 +116,6 @@ __global__ void Convolution2DGPU(float* input, float* kernel, float* output, int
 		}
 	}
 
-	// Write the result to the output
 	int outputIndex = row * *outputWidth + col;
 	output[outputIndex] = sum;
 }
