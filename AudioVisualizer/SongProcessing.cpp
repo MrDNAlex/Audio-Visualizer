@@ -9,6 +9,9 @@
 #include "device_launch_parameters.h"
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\FourierTransform.cuh"
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\Convolution.cuh"
+#include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\Visualizer.cuh"
+
+
 
 
 class SongProcessing
@@ -267,10 +270,43 @@ public:
 		delete[] kernel;
 		delete[] input;
 
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 1000; i++)
 		{
-			DrawImage(i);
+			GenerateFrame(i, convolvedBands[i]);
 		}
+
+	}
+
+	void GenerateFrame(int index, std::vector<float> bars)
+	{
+		int imageWidth = 1920;
+		int imageHeight = 1080;
+
+		int numBars = bars.size();
+		int spacing = 10;
+
+		int barWidth = (imageWidth - (spacing * (numBars + 1))) / numBars;
+
+		RectInfo* rects = new RectInfo[numBars];
+
+		for (int i = 0; i < numBars; i++)
+		{
+			RectInfo rectInfo = RectInfo();
+
+			rectInfo.width = barWidth;
+			rectInfo.height = bars[i] * 800 + spacing;
+			rectInfo.xPos = spacing + (barWidth + spacing) * i;
+			rectInfo.yPos = imageHeight - rectInfo.height - spacing;
+
+			rectInfo.alpha = 255;
+			rectInfo.red = 0;
+			rectInfo.green = 255;
+			rectInfo.blue = 0;	
+
+			rects[i] = rectInfo;
+		}
+
+		VisualizeFrame(rects, numBars, index);
 	}
 
 	std::vector<std::vector<std::array<float, 2>>> oldMethod()
@@ -452,6 +488,12 @@ public:
 
 		return dft_frames;
 	}
+
+
+
+
+
+
 
 };
 

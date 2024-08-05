@@ -185,7 +185,7 @@ __global__ void drawKernel(unsigned char* img, int width, int height) {
 		img[offset] = x % 256;  // Red channel example
 		img[offset + 1] = y % 256; // Green channel example
 		img[offset + 2] = 128; // Blue channel static example
-		img[offset + 3] = 255; // Alpha channel
+		img[offset + 3] = 20; // Alpha channel
 	}
 }
 

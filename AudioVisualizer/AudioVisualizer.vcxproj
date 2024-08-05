@@ -90,6 +90,7 @@
     <CudaCompile Include="Convolution.cu" />
     <CudaCompile Include="FourierTransform.cu" />
     <CudaCompile Include="Garbage.cu" />
+    <CudaCompile Include="Visualizer.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioVisualizer.cpp" />
@@ -106,6 +107,7 @@
   <ItemGroup>
     <ClInclude Include="Convolution.cuh" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="Visualizer.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
