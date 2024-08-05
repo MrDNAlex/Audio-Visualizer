@@ -12,8 +12,6 @@
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\Visualizer.cuh"
 
 
-
-
 class SongProcessing
 {
 
@@ -27,6 +25,8 @@ public:
 	int numFrames;
 
 	float* signal;
+
+	std::vector<float> signalVector;
 
 	float* processedSignal;
 
@@ -49,7 +49,6 @@ public:
 
 	SongProcessing(char* songPath, int fps, int fft_size)
 	{
-
 		this->fps = fps;
 		this->fft_size = fft_size;
 
@@ -156,8 +155,21 @@ public:
 
 	void ProcessSignal()
 	{
-		int bands = 60;
+		int bands = 84;
 		float* data = new float[fft_size * numFrames];
+
+		std::vector<std::vector<float>> frames;
+
+		for (int i = 0; i < numFrames; i++) {
+			std::vector<float> frame;
+			for (int j = 0; j < fft_size; j++) {
+				frame.push_back(signal[i * fft_size + j]);
+			}
+			frames.push_back(frame);
+		}
+
+
+		//Seems like the Fourier Transform is is too big and GPU may not be able to handle it. Tomorrow fix this so that it splits the Fourier Transform into smaller Chunks and then try. (Try and batch for every 500 frames)
 
 		FourierTransformMagnitude(signal, data, fft_size, numFrames);
 
@@ -170,6 +182,13 @@ public:
 				int index = i * fft_size + j;
 				frame.push_back(data[index]);
 			}
+
+			if (i == 2000)
+			{
+				int hello = 0;
+			}
+
+
 			nyquistMag.push_back(frame);
 		}
 
@@ -181,6 +200,7 @@ public:
 
 		float start = 0;
 		float stop = log10(freqBins[(fft_size / 2) - 1]);
+		//float stop = freqBins[(fft_size / 2) - 1];
 
 		std::vector<float> logFreqs = logspace(start, stop, bands + 1);
 
@@ -220,8 +240,8 @@ public:
 		int inputHeight = bandData.size();
 		int inputWidth = bands;
 
-		int kernelWidth = 3;
-		int kernelHeight = 3;
+		int kernelWidth = 5;
+		int kernelHeight = 5;
 
 		int kernelSize = kernelWidth * kernelHeight;
 
@@ -263,14 +283,12 @@ public:
 			convolvedBands.push_back(band);
 		}
 
-		//Should be good Now, just gotta figure out how to visualize it
-
 		delete[] data;
 		delete[] output;
 		delete[] kernel;
 		delete[] input;
 
-		for (int i = 0; i < 1000; i++)
+		for (int i = 0; i < convolvedBands.size(); i++)
 		{
 			GenerateFrame(i, convolvedBands[i]);
 		}
@@ -299,14 +317,16 @@ public:
 			rectInfo.yPos = imageHeight - rectInfo.height - spacing;
 
 			rectInfo.alpha = 255;
-			rectInfo.red = 0;
-			rectInfo.green = 255;
+			rectInfo.red = 255;
+			rectInfo.green = 0;
 			rectInfo.blue = 0;	
 
 			rects[i] = rectInfo;
 		}
 
 		VisualizeFrame(rects, numBars, index);
+
+		delete[] rects;
 	}
 
 	std::vector<std::vector<std::array<float, 2>>> oldMethod()
@@ -348,6 +368,7 @@ public:
 		for (int i = 0; i < numFrames; i++) {
 			for (int j = 0; j < fft_size; j++) {
 				// Normalizing the short sample to float in the range [-1.0, 1.0]
+
 				signal[i * fft_size + j] = audioSignal[i * frameSize + j] / 32768.0f;
 			}
 		}

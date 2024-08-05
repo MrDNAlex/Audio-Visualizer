@@ -25,11 +25,11 @@ __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, 
 		{
 			int index = (yIndex * imgWidth + xIndex) * 3;
 
-			//BMP = blue
+			//BMP = blue, green, red
 
-			frame[index] = rect.red; //Color the pixel
+			frame[index] = rect.blue; //Color the pixel
 			frame[index + 1] = rect.green; //Color the pixel
-			frame[index + 2] = rect.blue; //Color the pixel
+			frame[index + 2] = rect.red; //Color the pixel
 			//frame[index + 3] = rect.alpha;
 
 			drawn = true;
@@ -97,6 +97,8 @@ cudaError_t VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
 	cudaFree(gpuWidth);
 	cudaFree(gpuHeight);
 	cudaFree(gpuFrame);
+
+	delete[] frame;
 
 	return cudaStatus;
 }

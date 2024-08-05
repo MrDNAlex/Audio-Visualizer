@@ -7,12 +7,19 @@
 
 __global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int* numOfFrames)
 {
+	int fftSize = *fft_size;
+	int frameNums = *numOfFrames;
+	int signalSize = fftSize * frameNums;
+
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
+
 	int N = *fft_size;
 	int outputIndex = N * index;
 	const float pi = 3.14159265358979323846;
 
-	if (index >= *numOfFrames) return;
+	//printf("index: %d\n", index);
+
+	if (index >= frameNums) return;
 
 	for (int k = 0; k < N; k++)
 	{
@@ -32,37 +39,6 @@ __global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int*
 		int signalIndex = outputIndex + k;
 
 		output[signalIndex] = sqrtf(real * real + imag * imag);
-	}
-}
-
-__global__ void DFTGPU(float* input, FourierData* output, int* fft_size, int* numOfFrames)
-{
-	int index = blockIdx.x * blockDim.x + threadIdx.x;
-	int N = *fft_size;
-	int outputIndex = N * index;
-	const float pi = 3.14159265358979323846;
-
-	if (index >= *numOfFrames) return;
-
-	for (int k = 0; k < N; k++)
-	{
-		float real = 0.0f;
-		float imag = 0.0f;
-		float angleStart = 2 * pi * k / N;
-
-		for (int n = 0; n < N; n++)
-		{
-			float angle = angleStart * n;
-			float inputValue = input[outputIndex + n];
-
-			real += inputValue * cosf(angle);
-			imag += inputValue * sinf(angle);
-		}
-
-		int signalIndex = outputIndex + k;
-
-		output[signalIndex].real = real;
-		output[signalIndex].imag = imag;
 	}
 }
 
@@ -103,6 +79,36 @@ cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size,
 	return cudaStatus;
 }
 
+__global__ void DFTGPU(float* input, FourierData* output, int* fft_size, int* numOfFrames)
+{
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	int N = *fft_size;
+	int outputIndex = N * index;
+	const float pi = 3.14159265358979323846;
+
+	if (index >= *numOfFrames * *fft_size) return;
+
+	for (int k = 0; k < N; k++)
+	{
+		float real = 0.0f;
+		float imag = 0.0f;
+		float angleStart = 2 * pi * k / N;
+
+		for (int n = 0; n < N; n++)
+		{
+			float angle = angleStart * n;
+			float inputValue = input[outputIndex + n];
+
+			real += inputValue * cosf(angle);
+			imag += inputValue * sinf(angle);
+		}
+
+		int signalIndex = outputIndex + k;
+
+		output[signalIndex].real = real;
+		output[signalIndex].imag = imag;
+	}
+}
 
 cudaError_t FourierTransform(float* input, FourierData* output, int fft_size, int numOfFrames)
 {
