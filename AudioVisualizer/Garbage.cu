@@ -176,3 +176,24 @@
 
 	// Save to PNG using lodepng
 	//unsigned error = lodepng_encode32_file(filename, frame, width, height);
+
+
+
+//BMP = blue, green, red
+			//frame[index] = rect.blue; //Color the pixel
+			//frame[index + 1] = rect.green; //Color the pixel
+			//frame[index + 2] = rect.red; //Color the pixel
+			//frame[index + 3] = rect.alpha;
+
+
+			//PNG = red, green, blue
+//frame[index] = rect.red; //Color the pixel
+//frame[index + 1] = rect.green; //Color the pixel
+//frame[index + 2] = rect.blue; //Color the pixel
+//frame[index + 3] = rect.alpha;
+
+//JPG = red, green, blue
+//frame[index] = rect.red; //Color the pixel
+//frame[index + 1] = rect.green; //Color the pixel
+//frame[index + 2] = rect.blue; //Color the pixel
+//frame[index + 3] = rect.alpha;

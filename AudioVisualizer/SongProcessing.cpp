@@ -196,10 +196,10 @@ public:
 		}
 
 		float start = 0;
-		//float stop = log10(freqBins[(fft_size / 2) - 1]);
-		float stop = freqBins[(fft_size / 2) - 1];
+		float stop = log10(freqBins[(fft_size / 2) - 1]);
+		//float stop = freqBins[(fft_size / 2) - 1];
 
-		std::vector<float> logFreqs = linspace(start, stop, bands + 1);
+		std::vector<float> logFreqs = logspace(start, stop, bands + 1);
 
 		std::vector<std::vector<float>> bandData(nyquistMag.size());
 

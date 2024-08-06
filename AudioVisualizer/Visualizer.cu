@@ -1,7 +1,5 @@
 #include "Visualizer.cuh"
 
-#include "ImageSavers.cpp"
-
 __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, int* height, unsigned char* frame)
 {
 	int xIndex = blockIdx.x * blockDim.x + threadIdx.x;
@@ -23,24 +21,10 @@ __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, 
 		{
 			int index = (yIndex * imgWidth + xIndex) * 3;
 
-			//BMP = blue, green, red
-			//frame[index] = rect.blue; //Color the pixel
-			//frame[index + 1] = rect.green; //Color the pixel
-			//frame[index + 2] = rect.red; //Color the pixel
-			//frame[index + 3] = rect.alpha;
-
-
-			//PNG = red, green, blue
+			//JPG = red, green, blue
 			frame[index] = rect.red; //Color the pixel
 			frame[index + 1] = rect.green; //Color the pixel
 			frame[index + 2] = rect.blue; //Color the pixel
-			//frame[index + 3] = rect.alpha;
-
-			//JPG = red, green, blue
-			//frame[index] = rect.red; //Color the pixel
-			//frame[index + 1] = rect.green; //Color the pixel
-			//frame[index + 2] = rect.blue; //Color the pixel
-			//frame[index + 3] = rect.alpha;
 
 			drawn = true;
 		}
@@ -51,22 +35,9 @@ __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, 
 		int index = (yIndex * imgWidth + xIndex) * 3;
 
 		//JPG = red, green, blue
-		//frame[index] = 0; //Color the pixel
-		//frame[index + 1] = 0; //Color the pixel
-		//frame[index + 2] = 0; //Color the pixel
-		//frame[index + 3] = 0;
-
-		//PNG = red, green, blue
 		frame[index] = 0; //Color the pixel
 		frame[index + 1] = 0; //Color the pixel
 		frame[index + 2] = 0; //Color the pixel
-		//frame[index + 3] = 0;
-
-		//BMP = blue, green, red
-		//frame[index] = 0; //Color the pixel
-		//frame[index + 1] = 0; //Color the pixel
-		//frame[index + 2] = 0; //Color the pixel
-		//frame[index + 3] = 0;
 	}
 }
 
@@ -107,7 +78,7 @@ cudaError_t VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
 	char filename[100];
 
 	// Format the filename with the index
-	sprintf(filename, "C:\\Users\\MrDNA\\Downloads\\Frames\\frame%d.png", frameIndex);
+	sprintf(filename, "C:\\Users\\MrDNA\\Downloads\\Frames\\frame%d.jpg", frameIndex);
 	SaveJPEG(filename, frame, width, height);
 
 	cudaFree(gpuRects);

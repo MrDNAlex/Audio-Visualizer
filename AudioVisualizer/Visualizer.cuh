@@ -6,9 +6,9 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <iostream>
-#include "MemoryManagement.h"
-#include "lodepng.h"
 
+#include "MemoryManagement.h"
+#include "ImageSavers.h"
 
 struct RectInfo
 {
@@ -29,5 +29,4 @@ cudaError_t VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex);
 
 __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, int* height, unsigned char* frame);
 
-//void SaveJPEG(char* filename, unsigned char* image_buffer, int image_width, int image_height);
 #endif // VISUALIZER_CUH
