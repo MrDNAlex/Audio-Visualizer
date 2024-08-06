@@ -54,7 +54,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;sndfile.lib;DNA-CUDA-Essentials.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;sndfile.lib;DNA-CUDA-Essentials.lib;nvjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\DNA-CUDA-Essentials\DNA-CUDA-Essentials\x64\Debug\;C:\CPPLibraries\libsndfile\lib;..\AudioVisualizer;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioVisualizer.cpp" />
+    <ClCompile Include="jpegSaver.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="SongProcessing.cpp" />
   </ItemGroup>
@@ -105,7 +106,9 @@
     <Media Include="Overkill.wav" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BitmapSaver.h" />
     <ClInclude Include="Convolution.cuh" />
+    <ClInclude Include="jpegSaver.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Visualizer.cuh" />
   </ItemGroup>

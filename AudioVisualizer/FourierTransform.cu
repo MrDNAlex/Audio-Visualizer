@@ -5,7 +5,6 @@
 #include <iostream>
 #include <chrono>
 
-
 __global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int* numOfFrames)
 {
 	const float pi = 3.14159265358979323846;
