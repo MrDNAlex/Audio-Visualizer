@@ -5,40 +5,36 @@
 #include <iostream>
 #include <chrono>
 
+
 __global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int* numOfFrames)
 {
+	const float pi = 3.14159265358979323846;
+	int totalThreads = blockDim.x * gridDim.x;
+	int threadId = blockIdx.x * blockDim.x + threadIdx.x;
+
 	int fftSize = *fft_size;
 	int frameNums = *numOfFrames;
-	int signalSize = fftSize * frameNums;
 
-	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	int totalOps = fftSize * frameNums;
 
-	int N = *fft_size;
-	int outputIndex = N * index;
-	const float pi = 3.14159265358979323846;
+	if (threadId < totalOps) {
+		int frameIndex = threadId / fftSize;  
+		int k = threadId % fftSize;
 
-	//printf("index: %d\n", index);
-
-	if (index >= frameNums) return;
-
-	for (int k = 0; k < N; k++)
-	{
 		float real = 0.0f;
 		float imag = 0.0f;
-		float angleStart = 2 * pi * k / N;
+		float angleStart = 2 * pi * k / fftSize;
 
-		for (int n = 0; n < N; n++)
+		for (int n = 0; n < fftSize; n++)
 		{
 			float angle = angleStart * n;
-			float inputValue = input[outputIndex + n];
+			float inputValue = input[frameIndex * fftSize + n];
 
 			real += inputValue * cosf(angle);
 			imag += inputValue * sinf(angle);
 		}
 
-		int signalIndex = outputIndex + k;
-
-		output[signalIndex] = sqrtf(real * real + imag * imag);
+		output[frameIndex * fftSize + k] = sqrtf(real * real + imag * imag);
 	}
 }
 
@@ -62,22 +58,25 @@ cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size,
 
 	cudaStatus = AssignMemory((void**)&kernel_output, sizeof(float), signalSize);
 
-	int threads = 1024;
-	int blocks = (numOfFrames / threads) + 1;
+	int threadsPerBlock = 1024;
+	int totalOps = fft_size * numOfFrames;
+	int blocks = (totalOps + threadsPerBlock - 1) / threadsPerBlock;
 
-	DFTMagnitudeGPU << <blocks, threads >> > (kernel_input, kernel_output, kernel_fft_size, kernel_numOfFrames);
+	DFTMagnitudeGPU << <blocks, threadsPerBlock >> > (kernel_input, kernel_output, kernel_fft_size, kernel_numOfFrames);
 
 	cudaStatus = cudaDeviceSynchronize();
 
-	cudaStatus = GetVariable(output, kernel_output, signalSize);
+	cudaStatus = GetVariable(output, kernel_output, sizeof(float), signalSize);
 
 	cudaFree(kernel_input);
 	cudaFree(kernel_output);
 	cudaFree(kernel_fft_size);
 	cudaFree(kernel_numOfFrames);
 
+	std::cout << "Finished FourierTransform" << std::endl;
+
 	return cudaStatus;
-}
+}	
 
 __global__ void DFTGPU(float* input, FourierData* output, int* fft_size, int* numOfFrames)
 {
@@ -137,12 +136,14 @@ cudaError_t FourierTransform(float* input, FourierData* output, int fft_size, in
 
 	cudaStatus = cudaDeviceSynchronize();
 
-	cudaStatus = GetVariable(output, kernel_output, signalSize);
+	cudaStatus = GetVariable(output, kernel_output, sizeof(float), signalSize);
 
 	cudaFree(kernel_input);
 	cudaFree(kernel_output);
 	cudaFree(kernel_fft_size);
 	cudaFree(kernel_numOfFrames);
+
+	std::cout << "Finished FourierTransform" << std::endl;
 
 	return cudaStatus;
 }

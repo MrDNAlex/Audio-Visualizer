@@ -168,10 +168,9 @@ public:
 			frames.push_back(frame);
 		}
 
-
-		//Seems like the Fourier Transform is is too big and GPU may not be able to handle it. Tomorrow fix this so that it splits the Fourier Transform into smaller Chunks and then try. (Try and batch for every 500 frames)
-
 		FourierTransformMagnitude(signal, data, fft_size, numFrames);
+
+		std::cout << "Extracting Nyquist Frequencies" << std::endl;
 
 		std::vector<std::vector<float>> nyquistMag;
 
@@ -183,14 +182,12 @@ public:
 				frame.push_back(data[index]);
 			}
 
-			if (i == 2000)
-			{
-				int hello = 0;
-			}
-
-
 			nyquistMag.push_back(frame);
 		}
+
+		std::cout << "Finished Extracting Nyquist Frequency" << std::endl;
+
+		std::cout << "Binning Frequencies" << std::endl;
 
 		std::vector<float> freqBins(nyquistMag[0].size());
 
@@ -237,6 +234,10 @@ public:
 			bandData[i] = vec;
 		}
 
+		std::cout << "Finished Binning Frequencies" << std::endl;
+
+		std::cout << "Smoothening Data" << std::endl;
+
 		int inputHeight = bandData.size();
 		int inputWidth = bands;
 
@@ -282,6 +283,10 @@ public:
 			}
 			convolvedBands.push_back(band);
 		}
+
+		std::cout << "Finished Smoothing Data" << std::endl;
+
+		std::cout << "Generating frames" << std::endl;
 
 		delete[] data;
 		delete[] output;
