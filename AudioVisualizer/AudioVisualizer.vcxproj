@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioVisualizer.cpp" />
+    <ClCompile Include="CPUAudioVisualizer.cpp" />
     <ClCompile Include="jpegSaver.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="SongProcessing.cpp" />
