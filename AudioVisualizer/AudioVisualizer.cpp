@@ -15,9 +15,9 @@
 int main()
 {
 	int fps = 30;
-	int fft_size = 2048 * 2;
+	int fft_size = 2048 * 8;
 
-	SongProcessing song = SongProcessing("MoreThanYouKnow.wav", fps, fft_size);
+	SongProcessing song = SongProcessing("Overkill.wav", fps, fft_size);
 
 	song.debugInfo();
 

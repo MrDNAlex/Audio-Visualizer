@@ -228,7 +228,7 @@ public:
 			printf("Freq (%d): %f\n", i, freqBins[i]);
 		}
 
-		float start = 0;
+		float start = log10(10); // Change to 5?
 		float stop = log10(freqBins[halfDFTSize - 1]);
 		//float stop = freqBins[halfDFTSize - 1];
 
