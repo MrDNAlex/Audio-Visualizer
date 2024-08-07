@@ -64,7 +64,9 @@
       <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
     </CudaCompile>
     <PreBuildEvent>
-      <Command>del "$(OutDir)$(TargetName)$(TargetExt)"</Command>
+      <Command>del "$(OutDir)$(TargetName)$(TargetExt)"
+devenv /Clean $(TargetName)
+</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

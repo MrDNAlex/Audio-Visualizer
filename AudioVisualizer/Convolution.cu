@@ -4,7 +4,7 @@
 #include "MemoryManagement.h"
 #include "lodepng.h"
 
-int GetConvolutionOutputSize(int width, int kernelSize, int stepSize)
+int getConvolutionOutputSize(int width, int kernelSize, int stepSize)
 {
 	return ((width - kernelSize) / stepSize) + 1;
 }
@@ -79,9 +79,9 @@ cudaError_t Convolution(float* input, float* kernel, float* output, int arraySiz
 	return cudaStatus;
 }
 
-std::pair<int, int> GetConvolutionOutputSize2D(int width, int height, int kernelWidth, int kernelHeight, int stepWidth, int stepHeight) {
-	int outputWidth = GetConvolutionOutputSize(width, kernelWidth, stepWidth);
-	int outputHeight = GetConvolutionOutputSize(height, kernelHeight, stepHeight);
+std::pair<int, int> getConvolutionOutputSize2D(int width, int height, int kernelWidth, int kernelHeight, int stepWidth, int stepHeight) {
+	int outputWidth = getConvolutionOutputSize(width, kernelWidth, stepWidth);
+	int outputHeight = getConvolutionOutputSize(height, kernelHeight, stepHeight);
 
 	return { outputWidth, outputHeight };
 }

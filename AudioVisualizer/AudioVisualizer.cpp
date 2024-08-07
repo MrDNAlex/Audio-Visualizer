@@ -15,7 +15,7 @@
 int main()
 {
 	int fps = 30;
-	int fft_size = 2048 * 16;
+	int fft_size = 2048 * 2;
 
 	SongProcessing song = SongProcessing("MoreThanYouKnow.wav", fps, fft_size);
 

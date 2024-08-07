@@ -14,9 +14,9 @@ __global__ void ConvolutionGPU(float* input, float* kernel, float* output, int* 
 
 cudaError_t Convolution(float* input, float* kernel, float* output, int arraySize, int kernelSize, int stepSize, int outputSize);
 
-int GetConvolutionOutputSize(int width, int kernelSize, int stepSize);
+int getConvolutionOutputSize(int width, int kernelSize, int stepSize);
 
-int Get2DConvolutionOutputSize(int arraySizeX, int arraySizeY, int kernelSizeX, int kernelSizeY, int stepSizeX, int stepSizeY);
+int get2DConvolutionOutputSize(int arraySizeX, int arraySizeY, int kernelSizeX, int kernelSizeY, int stepSizeX, int stepSizeY);
 
 std::pair<int, int> GetConvolutionOutputSize2D(int width, int height, int kernelWidth, int kernelHeight, int stepWidth, int stepHeight);
 

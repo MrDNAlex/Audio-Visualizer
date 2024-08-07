@@ -90,6 +90,17 @@ public:
 		return result;
 	}
 
+	float* linspacePtr(float start, float stop, int num) {
+		float* result = new float[num];
+		float step = (stop - start) / (num - 1);
+
+		for (int i = 0; i < num; ++i) {
+			result[i] = start + i * step;
+		}
+
+		return result;
+	}
+
 	std::vector<float> logspace(float start, float stop, int num) {
 		std::vector<float> result;
 		std::vector<float> lin_space = linspace(start, stop, num);
@@ -97,6 +108,19 @@ public:
 		for (double v : lin_space) {
 			result.push_back(pow(10, v));
 		}
+
+		return result;
+	}
+
+	float* logspacePtr(float start, float stop, int num) {
+		float* result = new float[num];
+		float* lin_space = linspacePtr(start, stop, num);
+
+		for (int i = 0; i < num; i++) {
+			result[i] = pow(10, lin_space[i]);
+		}
+
+		delete[] lin_space;
 
 		return result;
 	}
@@ -156,19 +180,27 @@ public:
 		return vector;
 	}
 
-	void extractNyquistFrequencies(float* nyquist, float* dft)
+	float* extractNyquistFrequencies(float* dft)
 	{
+		float* nyquist = new float[numFrames * (halfDFTSize)];
+
+		std::cout << "Extracting Nyquist Frequencies" << std::endl;
+
 		for (int i = 0; i < numFrames; i++) {
 			for (int j = 0; j < halfDFTSize; j++) {
 				int index = i * dftSize + j;
 				nyquist[i * halfDFTSize + j] = dft[index];
 			}
 		}
+
+		std::cout << "Finished Extracting Nyquist Frequency" << std::endl;
+
+		return nyquist;
 	}
 
 	void processSignal()
 	{
-		int bands = 84;
+		int bands = 64;
 		float* dftData = new float[dftSize * numFrames];
 
 		std::vector<std::vector<float>> frames;
@@ -183,15 +215,9 @@ public:
 
 		FourierTransformMagnitude(signal, dftData, dftSize, numFrames);
 
-		std::cout << "Extracting Nyquist Frequencies" << std::endl;
-
-		float* nyquist = new float[numFrames * (halfDFTSize)];
-
-		extractNyquistFrequencies(nyquist, dftData);
+		float* nyquist = extractNyquistFrequencies(dftData);
 
 		delete[] dftData;
-
-		std::cout << "Finished Extracting Nyquist Frequency" << std::endl;
 
 		std::cout << "Binning Frequencies" << std::endl;
 
@@ -199,13 +225,19 @@ public:
 
 		for (int i = 0; i < halfDFTSize; i++) {
 			freqBins[i] = (float)i * sample_rate / dftSize;
+			printf("Freq (%d): %f\n", i, freqBins[i]);
 		}
 
 		float start = 0;
 		float stop = log10(freqBins[halfDFTSize - 1]);
 		//float stop = freqBins[halfDFTSize - 1];
 
-		std::vector<float> logFreqs = logspace(start, stop, bands + 1);
+		float* logFreqs = logspacePtr(start, stop, bands + 1);
+
+		for (int i = 0; i < bands; i++)
+		{
+			printf("LogFreq (%d): %f\n", i, logFreqs[i]);
+		}
 
 		std::vector<std::vector<float>> bandData(numFrames);
 
@@ -240,8 +272,24 @@ public:
 			bandData[i] = vec;
 		}
 
+		delete[] logFreqs;
+
 		std::cout << "Finished Binning Frequencies" << std::endl;
 
+		std::vector<std::vector<float>> convolvedBands = smoothData(bandData, bands);
+
+		std::cout << "Generating frames" << std::endl;
+
+		delete[] nyquist;
+
+		for (int i = 0; i < convolvedBands.size(); i++)
+		{
+			generateFrame(i, convolvedBands[i]);
+		}
+	}
+
+	std::vector<std::vector<float>> smoothData(std::vector<std::vector<float>> bandData, int bands)
+	{
 		std::cout << "Smoothening Data" << std::endl;
 
 		int inputHeight = bandData.size();
@@ -249,14 +297,13 @@ public:
 
 		int kernelWidth = 5;
 		int kernelHeight = 5;
-
 		int kernelSize = kernelWidth * kernelHeight;
 
 		int stepWidth = 1;
 		int stepHeight = 1;
 
-		int outputWidth = GetConvolutionOutputSize(inputWidth, kernelWidth, stepWidth);
-		int outputHeight = GetConvolutionOutputSize(inputHeight, kernelHeight, stepHeight);
+		int outputWidth = getConvolutionOutputSize(inputWidth, kernelWidth, stepWidth);
+		int outputHeight = getConvolutionOutputSize(inputHeight, kernelHeight, stepHeight);
 
 		float* output = new float[outputWidth * outputHeight];
 
@@ -290,23 +337,16 @@ public:
 			convolvedBands.push_back(band);
 		}
 
-		std::cout << "Finished Smoothing Data" << std::endl;
-
-		std::cout << "Generating frames" << std::endl;
-
 		delete[] output;
 		delete[] kernel;
 		delete[] input;
-		delete[] nyquist;
 
-		for (int i = 0; i < convolvedBands.size(); i++)
-		{
-			GenerateFrame(i, convolvedBands[i]);
-		}
+		std::cout << "Finished Smoothing Data" << std::endl;
 
+		return convolvedBands;
 	}
 
-	void GenerateFrame(int index, std::vector<float> bars)
+	void generateFrame(int index, std::vector<float> bars)
 	{
 		int imageWidth = 1920;
 		int imageHeight = 1080;
@@ -330,7 +370,7 @@ public:
 			rectInfo.alpha = 255;
 			rectInfo.red = 255;
 			rectInfo.green = 0;
-			rectInfo.blue = 0;	
+			rectInfo.blue = 0;
 
 			rects[i] = rectInfo;
 		}
@@ -340,28 +380,28 @@ public:
 		delete[] rects;
 	}
 
-	void extractSignal(std::vector<short> audioSignal, int fps = 24, int fft_size = 2048, int sample_rate = 22050, int channels = 1)
+	void extractSignal(std::vector<short> audioSignal, int fps = 24, int fftSize = 2048, int sampleRate = 22050, int channels = 1)
 	{
-		int frameSize = (sample_rate * channels) / fps; // This calculates how many samples per frame based on fps
+		int frameSize = (sampleRate * channels) / fps; // This calculates how many samples per frame based on fps
 
-		int numFrames = getNumOfFrames(audioSignal, fps, fft_size, sample_rate, channels);
+		int numFrames = getNumOfFrames(audioSignal, fps, fftSize, sampleRate, channels);
 
 		signal = new float[signalLength];
 
 		for (int i = 0; i < numFrames; i++) {
-			for (int j = 0; j < fft_size; j++) {
+			for (int j = 0; j < fftSize; j++) {
 				// Normalizing the short sample to float in the range [-1.0, 1.0]
-				signal[i * fft_size + j] = audioSignal[i * frameSize + j] / 32768.0f;
+				signal[i * fftSize + j] = audioSignal[i * frameSize + j] / 32768.0f;
 			}
 		}
 	}
 
-	int getNumOfFrames(std::vector<short> audioSignal, int fps = 24, int fft_size = 2048, int sample_rate = 22050, int channels = 1)
+	int getNumOfFrames(std::vector<short> audioSignal, int fps = 24, int fftSize = 2048, int sample_rate = 22050, int channels = 1)
 	{
 		int frameSize = (sample_rate * channels) / fps; // This calculates how many samples per frame based on fps
 
 		// Calculating the number of frames we can fit into the audioSignal with the given frameSize
-		int numFrames = ((audioSignal.size() - fft_size) / frameSize);
+		int numFrames = ((audioSignal.size() - fftSize) / frameSize);
 
 		return numFrames;
 	}
@@ -375,12 +415,12 @@ public:
 		std::cout << "Buffer Size: " << audioBuffer.size() << std::endl;
 	}
 
-	
 
 
 
-	
 
-	
+
+
+
 };
 
