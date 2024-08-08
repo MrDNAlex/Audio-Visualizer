@@ -12,8 +12,12 @@
 #include "device_launch_parameters.h"
 #include "SongProcessing.cpp"
 
-int main()
+int main(int argc, char* argv[])
 {
+	system("mkdir AudioVisualizerCache");
+	system("mkdir AudioVisualizerCache\\Audio");
+	system("mkdir AudioVisualizerCache\\Frames");
+
 	int fps = 30;
 	int fft_size = 2048 * 8;
 

@@ -12,6 +12,12 @@
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\Visualizer.cuh"
 
 
+//Monstercat Settings
+//68 Bands (64 in reality (Actually it might be 80)
+//5-20000 Hz
+//2048 * 8 FFT Size
+//30 FPS --> Upgrade to 60 FPS
+
 class SongProcessing
 {
 public:
@@ -200,9 +206,9 @@ public:
 
 	void processSignal()
 	{
-		int bands = 64;
+		int bands = 68;
 		float* dftData = new float[dftSize * numFrames];
-
+		
 		std::vector<std::vector<float>> frames;
 
 		for (int i = 0; i < numFrames; i++) {
@@ -228,7 +234,7 @@ public:
 			printf("Freq (%d): %f\n", i, freqBins[i]);
 		}
 
-		float start = log10(10); // Change to 5?
+		float start = log10(5); // Change to 5?
 		float stop = log10(freqBins[halfDFTSize - 1]);
 		//float stop = freqBins[halfDFTSize - 1];
 
@@ -272,6 +278,7 @@ public:
 			bandData[i] = vec;
 		}
 
+		delete[] nyquist;
 		delete[] logFreqs;
 
 		std::cout << "Finished Binning Frequencies" << std::endl;
@@ -279,8 +286,6 @@ public:
 		std::vector<std::vector<float>> convolvedBands = smoothData(bandData, bands);
 
 		std::cout << "Generating frames" << std::endl;
-
-		delete[] nyquist;
 
 		for (int i = 0; i < convolvedBands.size(); i++)
 		{
