@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 
 	char audioPath[1000];
 
-	sprintf(audioPath, "Overkill.wav");
+	sprintf(audioPath, "MoreThanYouKnow.wav");
 
 	SongProcessing song = SongProcessing(audioPath, fps, fft_size);
 
@@ -44,9 +44,9 @@ int main(int argc, char* argv[])
 
 	sprintf(outputVideoPath, "AudioVisualizerCache\\output.mp4");
 
-	sprintf(framesPath, "AudioVisualizerCache\\Frames\\frame%d.jpg");
+	sprintf(framesPath, "AudioVisualizerCache\\Frames\\frame%%d.jpg");
 
-	sprintf(ffmpegCommand, "ffmpeg -r %d -framerate %d -i %s -i %s -c:v libx264 -pix_fmt yuv420p %s", fps, fps, audioPath, framesPath, outputVideoPath);
+	sprintf(ffmpegCommand, "ffmpeg -framerate %d -i %s -i %s -c:v libx264 -r %d -pix_fmt yuv420p %s", fps, framesPath, audioPath, fps, outputVideoPath);
 
 	printf("Making Video\n");
 

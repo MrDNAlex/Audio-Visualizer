@@ -40,6 +40,8 @@ public:
 
 
 	//Audio file properties
+	char* songPath;
+
 	int sample_rate;
 
 	int audioFrames;
@@ -52,18 +54,18 @@ public:
 
 	SF_INFO info;
 
-	SongProcessing(char* songPath, int fps, int dft_size)
+	SongProcessing(char* songPath, int fps, int dftSize)
 	{
 		this->fps = fps;
-		this->dftSize = dft_size;
-		this->halfDFTSize = dft_size / 2;
+		this->dftSize = dftSize;
+		this->halfDFTSize = dftSize / 2;
 
 		extractAudio(songPath);
 
-		this->numFrames = getNumOfFrames(audioBuffer, fps, dft_size, sample_rate, channels);
-		this->signalLength = numFrames * dft_size;
+		this->numFrames = getNumOfFrames(audioBuffer, fps, dftSize, sample_rate, channels);
+		this->signalLength = numFrames * dftSize;
 
-		extractSignal(audioBuffer, fps, dft_size, sample_rate, channels);
+		extractSignal(audioBuffer, fps, dftSize, sample_rate, channels);
 	}
 
 	void extractAudio(char* songPath)
@@ -208,7 +210,7 @@ public:
 	{
 		int bands = 68;
 		float* dftData = new float[dftSize * numFrames];
-		
+
 		std::vector<std::vector<float>> frames;
 
 		for (int i = 0; i < numFrames; i++) {
@@ -386,7 +388,7 @@ public:
 
 	void extractSignal(std::vector<short> audioSignal, int fps = 24, int fftSize = 2048, int sampleRate = 22050, int channels = 1)
 	{
-		int frameSize = (sampleRate * channels) / fps; // This calculates how many samples per frame based on fps
+		int frameSize = (sampleRate * channels) / fps;
 
 		int numFrames = getNumOfFrames(audioSignal, fps, fftSize, sampleRate, channels);
 
@@ -418,13 +420,5 @@ public:
 		std::cout << "Duration: " << static_cast<double>(numFrames) / info.samplerate << " seconds." << std::endl;
 		std::cout << "Buffer Size: " << audioBuffer.size() << std::endl;
 	}
-
-
-
-
-
-
-
-
 };
 
