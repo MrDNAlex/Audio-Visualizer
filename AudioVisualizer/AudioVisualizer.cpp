@@ -14,6 +14,11 @@
 
 int main(int argc, char* argv[])
 {
+	for (int i = 0; i < argc; i++)
+	{
+		std::cout << argv[i] << std::endl;
+	}
+
 	system("mkdir AudioVisualizerCache");
 	system("mkdir AudioVisualizerCache\\Audio");
 	system("mkdir AudioVisualizerCache\\Frames");
@@ -21,12 +26,31 @@ int main(int argc, char* argv[])
 	int fps = 30;
 	int fft_size = 2048 * 8;
 
-	SongProcessing song = SongProcessing("Overkill.wav", fps, fft_size);
+	char audioPath[1000];
+
+	sprintf(audioPath, "Overkill.wav");
+
+	SongProcessing song = SongProcessing(audioPath, fps, fft_size);
 
 	song.debugInfo();
 
 	song.processSignal();
 
+	char ffmpegCommand[1000];
+
+	char framesPath[1000];
+
+	char outputVideoPath[1000];
+
+	sprintf(outputVideoPath, "AudioVisualizerCache\\output.mp4");
+
+	sprintf(framesPath, "AudioVisualizerCache\\Frames\\frame%d.jpg");
+
+	sprintf(ffmpegCommand, "ffmpeg -r %d -framerate %d -i %s -i %s -c:v libx264 -pix_fmt yuv420p %s", fps, fps, audioPath, framesPath, outputVideoPath);
+
+	printf("Making Video\n");
+
+	system(ffmpegCommand);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

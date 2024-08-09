@@ -231,19 +231,12 @@ public:
 
 		for (int i = 0; i < halfDFTSize; i++) {
 			freqBins[i] = (float)i * sample_rate / dftSize;
-			printf("Freq (%d): %f\n", i, freqBins[i]);
 		}
 
 		float start = log10(5); // Change to 5?
 		float stop = log10(freqBins[halfDFTSize - 1]);
-		//float stop = freqBins[halfDFTSize - 1];
 
 		float* logFreqs = logspacePtr(start, stop, bands + 1);
-
-		for (int i = 0; i < bands; i++)
-		{
-			printf("LogFreq (%d): %f\n", i, logFreqs[i]);
-		}
 
 		std::vector<std::vector<float>> bandData(numFrames);
 
@@ -380,9 +373,15 @@ public:
 			rects[i] = rectInfo;
 		}
 
-		VisualizeFrame(rects, numBars, index);
+		unsigned char* frame = VisualizeFrame(rects, numBars, index);
+
+		char filename[100];
+
+		sprintf(filename, "AudioVisualizerCache\\Frames\\frame%d.jpg", index);
+		SaveJPEG(filename, frame, imageWidth, imageHeight);
 
 		delete[] rects;
+		delete[] frame;
 	}
 
 	void extractSignal(std::vector<short> audioSignal, int fps = 24, int fftSize = 2048, int sampleRate = 22050, int channels = 1)

@@ -25,7 +25,7 @@ struct RectInfo
 	int alpha;
 };
 
-cudaError_t VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex);
+unsigned char* VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex);
 
 __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, int* height, unsigned char* frame);
 

@@ -41,7 +41,7 @@ __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, 
 	}
 }
 
-cudaError_t VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
+unsigned char* VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
 {
 	int width = 1920;
 	int height = 1080;
@@ -75,21 +75,13 @@ cudaError_t VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
 
 	cudaStatus = GetVariable(frame, gpuFrame, sizeof(unsigned char), frameSize);
 
-	char filename[100];
-
-	// Format the filename with the index
-	sprintf(filename, "C:\\Users\\MrDNA\\Downloads\\Frames\\frame%d.jpg", frameIndex);
-	SaveJPEG(filename, frame, width, height);
-
 	cudaFree(gpuRects);
 	cudaFree(gpuNumOfRects);
 	cudaFree(gpuWidth);
 	cudaFree(gpuHeight);
 	cudaFree(gpuFrame);
 
-	delete[] frame;
-
-	return cudaStatus;
+	return frame;
 }
 
 
