@@ -12,23 +12,65 @@
 #include "device_launch_parameters.h"
 #include "SongProcessing.cpp"
 
-int main(int argc, char* argv[])
+
+char audioPath[1000];
+
+void debugCLI(int argc, char* argv[])
 {
 	for (int i = 0; i < argc; i++)
 	{
 		std::cout << argv[i] << std::endl;
 	}
+}
 
+void createCache()
+{
 	system("mkdir AudioVisualizerCache");
 	system("mkdir AudioVisualizerCache\\Audio");
 	system("mkdir AudioVisualizerCache\\Frames");
+}
+
+void convertAudio(char* audioPath[])
+{
+	char conversionCommand[1000];
+
+	sprintf(conversionCommand, "ffmpeg -i \"%s\" \"AudioVisualizerCache\\Audio\\audio.wav\"", *audioPath);
+
+	system(conversionCommand);
+
+#ifdef _WIN32
+	system("cls");
+	system("clear");
+#else
+	system("clear");
+#endif
+}
+
+int main(int argc, char* argv[])
+{
+	debugCLI(argc, argv);
+
+	sprintf(audioPath, argv[1]);
+
+	createCache();
+
+	char conversionCommand[1000];
+
+	sprintf(conversionCommand, "ffmpeg -i \"%s\" \"AudioVisualizerCache\\Audio\\audio.wav\"", audioPath);
+
+	system(conversionCommand);
+
+#ifdef _WIN32
+	system("cls");
+	system("clear");
+#else
+	system("clear");
+#endif
+
+	sprintf(audioPath, "AudioVisualizerCache\\Audio\\audio.wav");
 
 	int fps = 30;
 	int fft_size = 2048 * 8;
-
-	char audioPath[1000];
-
-	sprintf(audioPath, "MoreThanYouKnow.wav");
 
 	SongProcessing song = SongProcessing(audioPath, fps, fft_size);
 
@@ -51,6 +93,8 @@ int main(int argc, char* argv[])
 	printf("Making Video\n");
 
 	system(ffmpegCommand);
+
+	system("rm -r AudioVisualizerCache\\Frames");
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
