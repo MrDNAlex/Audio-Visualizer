@@ -46,6 +46,13 @@ void convertAudio(char* audioPath[])
 #endif
 }
 
+
+//Change to extracting the name of the file
+// Make a folder named after the song in the Cache
+// Make a folder named Frames and Audio in the Cache
+// Create the Visualizer, name the output file after the song
+
+
 int main(int argc, char* argv[])
 {
 	debugCLI(argc, argv);
