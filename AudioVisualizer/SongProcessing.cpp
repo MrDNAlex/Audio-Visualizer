@@ -38,6 +38,8 @@ public:
 
 	int signalLength;
 
+	int barHeight = 500;
+
 
 	//Audio file properties
 	char* songPath;
@@ -268,9 +270,37 @@ public:
 				}
 			}
 
-			std::vector<float> vec = normalize(band);
+			bandData[i] = normalize(band);
+		}
+		
+		//Kinda Good for now
+		//Instead we will find the mean and the standard deviation of the bands
+		// The we scale from 0 to 2 STD from the mean, and then from there we normalize
 
-			bandData[i] = vec;
+		std::vector<std::vector<float>> normalizedBandData(bands);
+
+		for (int i = 0; i < bands; i++)
+		{
+			std::vector<float> band(numFrames);
+			for (int j = 0; j < numFrames; j++)
+			{
+				band[j] = bandData[j][i];
+			}
+
+			normalizedBandData[i] = normalize(band);
+		}
+
+		std::vector<std::vector<float>> rotatedNormalizedBandData(numFrames);
+
+		for (int i = 0; i < numFrames; i++)
+		{
+			std::vector<float> frame(bands);
+			for (int j = 0; j < bands; j++)
+			{
+				frame[j] = normalizedBandData[j][i];
+			}
+
+			rotatedNormalizedBandData[i] = normalize(frame);
 		}
 
 		delete[] nyquist;
@@ -278,7 +308,7 @@ public:
 
 		std::cout << "Finished Binning Frequencies" << std::endl;
 
-		std::vector<std::vector<float>> convolvedBands = smoothData(bandData, bands);
+		std::vector<std::vector<float>> convolvedBands = smoothData(rotatedNormalizedBandData, bands);
 
 		std::cout << "Generating frames" << std::endl;
 
@@ -363,7 +393,7 @@ public:
 			RectInfo rectInfo = RectInfo();
 
 			rectInfo.width = barWidth;
-			rectInfo.height = bars[i] * 800 + spacing;
+			rectInfo.height = bars[i] * barHeight + spacing;
 			rectInfo.xPos = spacing + (barWidth + spacing) * i;
 			rectInfo.yPos = imageHeight - rectInfo.height - spacing;
 
