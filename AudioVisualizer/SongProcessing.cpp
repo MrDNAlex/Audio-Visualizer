@@ -38,7 +38,7 @@ public:
 
 	int signalLength;
 
-	int barHeight = 500;
+	int barHeight = 600;
 
 
 	//Audio file properties
@@ -177,6 +177,29 @@ public:
 		return max;
 	}
 
+	std::vector<float> normalizeGaus(std::vector<float> vector)
+	{
+		float mean = getMean(vector);
+		float std = getStandardDeviation(vector);
+
+		float interval = mean + 2 * std;
+
+		if (std == 0)
+			std = 0.0001;
+
+		for (int i = 0; i < vector.size(); i++)
+		{
+			float value = vector[i];
+
+			if (value > interval)
+				value = interval;
+
+			vector[i] = (value) / (2 * std);
+		}
+
+		return vector;
+	}
+
 	std::vector<float> normalize(std::vector<float> vector)
 	{
 		float max = getMax(vector);
@@ -206,6 +229,31 @@ public:
 		std::cout << "Finished Extracting Nyquist Frequency" << std::endl;
 
 		return nyquist;
+	}
+
+	float getMean(std::vector<float> vector)
+	{
+		float sum = 0;
+
+		for (int i = 0; i < vector.size(); i++)
+		{
+			sum += vector[i];
+		}
+
+		return sum / vector.size();
+	}
+
+	float getStandardDeviation(std::vector<float> vector)
+	{
+		float mean = getMean(vector);
+		float sum = 0;
+
+		for (int i = 0; i < vector.size(); i++)
+		{
+			sum += pow(vector[i] - mean, 2);
+		}
+
+		return sqrt(sum / vector.size());
 	}
 
 	void processSignal()
@@ -270,9 +318,10 @@ public:
 				}
 			}
 
-			bandData[i] = normalize(band);
+			bandData[i] = normalizeGaus(band);
+			//bandData[i] = band;
 		}
-		
+
 		//Kinda Good for now
 		//Instead we will find the mean and the standard deviation of the bands
 		// The we scale from 0 to 2 STD from the mean, and then from there we normalize
@@ -287,7 +336,7 @@ public:
 				band[j] = bandData[j][i];
 			}
 
-			normalizedBandData[i] = normalize(band);
+			normalizedBandData[i] = normalizeGaus(band);
 		}
 
 		std::vector<std::vector<float>> rotatedNormalizedBandData(numFrames);
@@ -300,7 +349,8 @@ public:
 				frame[j] = normalizedBandData[j][i];
 			}
 
-			rotatedNormalizedBandData[i] = normalize(frame);
+			//rotatedNormalizedBandData[i] = normalize(frame);
+			rotatedNormalizedBandData[i] = frame;
 		}
 
 		delete[] nyquist;
@@ -308,7 +358,7 @@ public:
 
 		std::cout << "Finished Binning Frequencies" << std::endl;
 
-		std::vector<std::vector<float>> convolvedBands = smoothData(rotatedNormalizedBandData, bands);
+		std::vector<std::vector<float>> convolvedBands = smoothData(bandData, bands);
 
 		std::cout << "Generating frames" << std::endl;
 

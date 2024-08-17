@@ -15,6 +15,16 @@
 
 char audioPath[1000];
 
+void clearScreen()
+{
+#ifdef _WIN32
+	system("cls");
+	system("clear");
+#else
+	system("clear");
+#endif
+}
+
 void debugCLI(int argc, char* argv[])
 {
 	for (int i = 0; i < argc; i++)
@@ -38,14 +48,8 @@ void convertAudio(char* audioPath[])
 
 	system(conversionCommand);
 
-#ifdef _WIN32
-	system("cls");
-	system("clear");
-#else
-	system("clear");
-#endif
+	clearScreen();
 }
-
 
 //Change to extracting the name of the file
 // Make a folder named after the song in the Cache
@@ -67,12 +71,7 @@ int main(int argc, char* argv[])
 
 	system(conversionCommand);
 
-#ifdef _WIN32
-	system("cls");
-	system("clear");
-#else
-	system("clear");
-#endif
+	clearScreen();
 
 	sprintf(audioPath, "AudioVisualizerCache\\Audio\\audio.wav");
 
@@ -100,6 +99,8 @@ int main(int argc, char* argv[])
 	printf("Making Video\n");
 
 	system(ffmpegCommand);
+
+	clearScreen();
 
 	system("rm -r AudioVisualizerCache\\Frames");
 }
