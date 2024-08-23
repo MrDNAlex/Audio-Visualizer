@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 
 	sprintf(audioPath, "AudioVisualizerCache\\Audio\\audio.wav");
 
-	int fps = 60;
+	int fps = 30;
 	int fft_size = 2048 * 8;
 
 	SongProcessing song = SongProcessing(audioPath, fps, fft_size);

@@ -5,20 +5,20 @@
 #include <iostream>
 #include <chrono>
 
-__global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int* numOfFrames)
+__global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int* numOfFrames, int* totalThreads)
 {
 	const float pi = 3.14159265358979323846;
-	int totalThreads = blockDim.x * gridDim.x;
-	int threadId = blockIdx.x * blockDim.x + threadIdx.x;
 
 	int fftSize = *fft_size;
 	int frameNums = *numOfFrames;
-
+	int parallelThreads = *totalThreads;
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
 	int totalOps = fftSize * frameNums;
 
-	if (threadId < totalOps) {
-		int frameIndex = threadId / fftSize;  
-		int k = threadId % fftSize;
+	while (index < totalOps)
+	{
+		int frameIndex = index / fftSize;
+		int k = index % fftSize;
 
 		float real = 0.0f;
 		float imag = 0.0f;
@@ -34,12 +34,30 @@ __global__ void DFTMagnitudeGPU(float* input, float* output, int* fft_size, int*
 		}
 
 		output[frameIndex * fftSize + k] = sqrtf(real * real + imag * imag);
+
+		index += parallelThreads;
 	}
+}
+
+cudaDeviceProp getDeviveProperties()
+{
+	int device;
+	cudaGetDevice(&device);
+
+	cudaDeviceProp prop;
+	cudaGetDeviceProperties(&prop, device);
+
+	return prop;
 }
 
 cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size, int numOfFrames)
 {
 	std::cout << "FourierTransform" << std::endl;
+
+	int multiprocessorCount = getDeviveProperties().multiProcessorCount;
+	int threads = 1024;
+	int totalThreads = multiprocessorCount * threads;
+	int count = 0;
 
 	int signalSize = fft_size * numOfFrames;
 
@@ -47,6 +65,7 @@ cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size,
 	float* kernel_output = 0;
 	int* kernel_fft_size = 0;
 	int* kernel_numOfFrames = 0;
+	int* kernel_totalThreads = 0;
 
 	cudaError_t cudaStatus;
 	cudaStatus = cudaSetDevice(0);
@@ -54,6 +73,7 @@ cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size,
 	cudaStatus = AssignVariable((void**)&kernel_input, input, sizeof(float), signalSize);
 	cudaStatus = AssignVariable((void**)&kernel_fft_size, &fft_size, sizeof(int));
 	cudaStatus = AssignVariable((void**)&kernel_numOfFrames, &numOfFrames, sizeof(int));
+	cudaStatus = AssignVariable((void**)&kernel_totalThreads, &totalThreads, sizeof(int));
 
 	cudaStatus = AssignMemory((void**)&kernel_output, sizeof(float), signalSize);
 
@@ -61,7 +81,7 @@ cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size,
 	int totalOps = fft_size * numOfFrames;
 	int blocks = (totalOps + threadsPerBlock - 1) / threadsPerBlock;
 
-	DFTMagnitudeGPU << <blocks, threadsPerBlock >> > (kernel_input, kernel_output, kernel_fft_size, kernel_numOfFrames);
+	DFTMagnitudeGPU << <multiprocessorCount, threadsPerBlock >> > (kernel_input, kernel_output, kernel_fft_size, kernel_numOfFrames, kernel_totalThreads);
 
 	cudaStatus = cudaDeviceSynchronize();
 
