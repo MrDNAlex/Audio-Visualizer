@@ -182,7 +182,7 @@ public:
 		float mean = getMean(vector);
 		float std = getStandardDeviation(vector);
 
-		float interval = mean + 2 * std;
+		float interval = mean + 1.7 * std;
 
 		if (std == 0)
 			std = 0.0001;
@@ -194,7 +194,7 @@ public:
 			if (value > interval)
 				value = interval;
 
-			vector[i] = (value) / (2 * std);
+			vector[i] = (value) / (1.7 * std);
 		}
 
 		return vector;
@@ -275,6 +275,10 @@ public:
 
 		float* nyquist = extractNyquistFrequencies(dftData);
 
+
+
+
+
 		delete[] dftData;
 
 		std::cout << "Binning Frequencies" << std::endl;
@@ -350,7 +354,7 @@ public:
 			}
 
 			//rotatedNormalizedBandData[i] = normalize(frame);
-			rotatedNormalizedBandData[i] = frame;
+			rotatedNormalizedBandData[i] = normalizeGaus(frame);
 		}
 
 		delete[] nyquist;
