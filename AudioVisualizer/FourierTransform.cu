@@ -91,6 +91,7 @@ cudaError_t FourierTransformMagnitude(float* input, float* output, int fft_size,
 	cudaFree(kernel_output);
 	cudaFree(kernel_fft_size);
 	cudaFree(kernel_numOfFrames);
+	cudaFree(kernel_totalThreads);
 
 	std::cout << "Finished FourierTransform" << std::endl;
 

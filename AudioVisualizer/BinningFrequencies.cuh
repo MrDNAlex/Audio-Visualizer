@@ -1,17 +1,26 @@
-
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include <MemoryManagement.h>
 #include <vector>
 
 
-__global__ void BinFrequencie(float* input, float* output, int* fft_size, int* numOfFrames, int* totalThreads);
+__device__ float* normalizeGaus(float* vector, int size);
 
-std::vector<std::vector<float>> BinFrequencies();
+__device__ float getMean(float* vector, int size);
 
+__device__ float getStandardDeviation(float* vector, int size);
 
+__device__ int binarySearch(float* list, int size, float item);
 
+float* linspacePtr(float start, float stop, int num);
 
+float* logspacePtr(float start, float stop, int num);
+
+cudaDeviceProp getDeviveProperties();
+
+__global__ void BinFrequencie(int* gpuHalfDFTSize, int* gpuNumOfFrames, int* gpuNumOfBands, int* gpuTotalThreads, float* frequencyBins, float* logFrequencies, float* nyquistData, float* binnedFrequencies);
+
+std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int halfDFTSize, int numOfFrames, int numOfBands, int sampleRate);
 
 
 

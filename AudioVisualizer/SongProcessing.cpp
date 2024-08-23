@@ -10,6 +10,7 @@
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\FourierTransform.cuh"
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\Convolution.cuh"
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\Visualizer.cuh"
+#include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\BinningFrequencies.cuh"
 
 
 //Monstercat Settings
@@ -277,56 +278,11 @@ public:
 
 		float* nyquist = extractNyquistFrequencies(dftData);
 
-
-
-
-
 		delete[] dftData;
 
 		std::cout << "Binning Frequencies" << std::endl;
 
-		std::vector<float> freqBins(halfDFTSize);
-
-		for (int i = 0; i < halfDFTSize; i++) {
-			freqBins[i] = (float)i * sample_rate / halfDFTSize;
-		}
-
-		float start = log10(5); // Change to 5?
-		float stop = log10(freqBins[halfDFTSize - 1]);
-
-		float* logFreqs = logspacePtr(start, stop, bands + 1);
-
-		std::vector<std::vector<float>> bandData(numFrames);
-
-		for (int i = 0; i < numFrames; i++) {
-
-			std::vector<float> band(bands);
-			for (int j = 0; j < bands; j++)
-			{
-				int startIndex = binarySearch(freqBins, logFreqs[j]);
-				int endIndex = binarySearch(freqBins, logFreqs[j + 1]);
-
-				int delta = endIndex - startIndex;
-
-				if (delta > 0)
-				{
-					float sum = 0;
-					for (int k = startIndex; k <= endIndex; k++)
-					{
-						sum += nyquist[i * halfDFTSize + k];
-					}
-
-					band[j] = (sum / (float)delta);
-				}
-				else
-				{
-					band[j] = 0;
-				}
-			}
-
-			bandData[i] = normalizeGaus(band);
-			//bandData[i] = band;
-		}
+		std::vector<std::vector<float>> bandData = BinFrequencies(nyquist, halfDFTSize, numFrames, bands, sample_rate);
 
 		//Kinda Good for now
 		//Instead we will find the mean and the standard deviation of the bands
@@ -360,7 +316,7 @@ public:
 		}
 
 		delete[] nyquist;
-		delete[] logFreqs;
+		//delete[] logFreqs;
 
 		std::cout << "Finished Binning Frequencies" << std::endl;
 
