@@ -89,6 +89,7 @@ devenv /Clean $(TargetName)
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="BinningFrequencies.cu" />
     <CudaCompile Include="Convolution.cu" />
     <CudaCompile Include="FourierTransform.cu" />
     <CudaCompile Include="Garbage.cu" />
@@ -109,6 +110,7 @@ devenv /Clean $(TargetName)
     <Media Include="Overkill.wav" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BinningFrequencies.cuh" />
     <ClInclude Include="BitmapSaver.h" />
     <ClInclude Include="Convolution.cuh" />
     <ClInclude Include="jpegSaver.h" />

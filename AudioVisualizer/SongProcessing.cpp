@@ -256,6 +256,8 @@ public:
 		return sqrt(sum / vector.size());
 	}
 
+	//Make a Helper Function to Vectorize and Pointerize Data
+
 	void processSignal()
 	{
 		int bands = 68;
@@ -286,7 +288,7 @@ public:
 		std::vector<float> freqBins(halfDFTSize);
 
 		for (int i = 0; i < halfDFTSize; i++) {
-			freqBins[i] = (float)i * sample_rate / dftSize;
+			freqBins[i] = (float)i * sample_rate / halfDFTSize;
 		}
 
 		float start = log10(5); // Change to 5?
