@@ -106,8 +106,12 @@ devenv /Clean $(TargetName)
     <CudaCompile Include="FourierTransform.cuh" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="Overkill.mp3" />
-    <Media Include="Overkill.wav" />
+    <Media Include="Overkill.mp3">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </Media>
+    <Media Include="Overkill.wav">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinningFrequencies.cuh" />
