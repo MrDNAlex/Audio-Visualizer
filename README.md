@@ -16,7 +16,7 @@ As of late, now that I'm more familiar with the Math behind visualizing audio I 
 Once I do finish it I want to try and bundle it into a Discord Bot, a CLI tool, a Website or a mix and match of all 3.
 
 # Example Songs
-The Following are some of my favourite songs visualized using the program
+The Following are some of my favourite songs visualized using the program. Improvements still need to be made.
 
 ## [Overkill by RIOT](https://www.youtube.com/watch?v=A8pOVirjGF0)
 
