@@ -334,9 +334,7 @@ public:
 
 		bandData = ApplyDRC(bandData);
 
-		//Kinda Good for now
-		//Instead we will find the mean and the standard deviation of the bands
-		// The we scale from 0 to 2 STD from the mean, and then from there we normalize
+		//Just Normalize the Entire Binned Frequencies? Then apply the fminf and 0.8 exo scaling
 
 		std::vector<std::vector<float>> normalizedBandData(bands);
 
@@ -358,7 +356,7 @@ public:
 			std::vector<float> frame(bands);
 			for (int j = 0; j < bands; j++)
 			{
-				frame[j] = ExpScaling(normalizedBandData[j][i]);
+				frame[j] = ExpScaling(normalizedBandData[j][i]); //Fminf and Exp at 0.8?
 			}
 
 			//rotatedNormalizedBandData[i] = normalize(frame);
