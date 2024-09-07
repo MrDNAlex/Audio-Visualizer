@@ -23,6 +23,56 @@ __device__ float* normalizeGaus(float* vector, int size)
 	return vector;
 }
 
+__device__ float getMax(float* vector, int size)
+{
+	float max = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		if (vector[i] > max)
+			max = vector[i];
+	}
+
+	if (max == 0)
+		max = 0.0001;
+
+	return max;
+}
+
+__device__ float* normalize(float* vector, int size)
+{
+	float max = getMax(vector, size);
+
+	if (max == 0)
+		max = 0.0001;
+
+	for (int i = 0; i < size; i++)
+		vector[i] = vector[i] / max;
+
+	return vector;
+
+
+	/*float mean = getMean(vector, size);
+	float std = getStandardDeviation(vector, size);
+
+	float interval = mean + 1.7 * std;
+
+	if (std == 0)
+		std = 0.0001;
+
+	for (int i = 0; i < size; i++)
+	{
+		float value = vector[i];
+
+		if (value > interval)
+			value = interval;
+
+		vector[i] = (value) / (1.7 * std);
+	}
+
+	return vector;*/
+}
+
 __device__ float getMean(float* vector, int size)
 {
 	float sum = 0;
@@ -116,7 +166,7 @@ __global__ void BinFrequencie(int* gpuHalfDFTSize, int* gpuNumOfFrames, int* gpu
 			}
 		}
 
-		band = normalizeGaus(band, bands);
+		//band = normalize(band, bands);
 
 		for (int j = 0; j < bands; j++)
 		{
@@ -161,7 +211,7 @@ std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int ha
 	}
 
 	float start = log10(5); // Change to 5?
-	float stop = log10(freqBins[halfDFTSize - 1]);
+	float stop = log10(freqBins[halfDFTSize - 1]); //20 000?
 	float* logFreqs = logspacePtr(start, stop, numOfBands + 1);
 
 	int nyquistLength = halfDFTSize * numOfFrames;

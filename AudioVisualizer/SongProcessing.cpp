@@ -39,7 +39,8 @@ public:
 
 	int signalLength;
 
-	int barHeight = 600;
+	int barHeight = 400;
+	int bands = 67;
 
 
 	//Audio file properties
@@ -178,6 +179,19 @@ public:
 		return max;
 	}
 
+	float getMaxPntr(float* vector, int size)
+	{
+		float max = 0;
+
+		for (int i = 0; i < size; i++)
+		{
+			if (vector[i] > max)
+				max = vector[i];
+		}
+
+		return max;
+	}
+
 	std::vector<float> normalizeGaus(std::vector<float> vector)
 	{
 		float mean = getMean(vector);
@@ -197,6 +211,19 @@ public:
 
 			vector[i] = (value) / (1.7 * std);
 		}
+
+		return vector;
+	}
+
+	float* normalizePntr(float* vector, int size)
+	{
+		float max = getMaxPntr(vector, size);
+
+		if (max == 0)
+			max = 0.0001;
+
+		for (int i = 0; i < size; i++)
+			vector[i] = vector[i] / max;
 
 		return vector;
 	}
@@ -259,30 +286,51 @@ public:
 
 	//Make a Helper Function to Vectorize and Pointerize Data
 
+	std::vector<float> aWeight(int size, float maxFreq)
+	{
+		std::vector<float> aWeighting(size);
+
+		for (int i = 0; i < size; i++)
+		{
+			float frequencies = (((float)i) / size) * maxFreq;
+
+			float ra = 12194 * 12194 * pow(frequencies,4);
+			float rb = pow(frequencies, 2) + 20.6 * 20.6;
+			float rc = pow(frequencies, 2) + 107.7 * 107.7;
+			float rd = pow(frequencies, 2) + 737.9 * 737.9;
+			float re = pow(frequencies, 2) + 12194 * 12194;
+
+			aWeighting[i] = ra / (rb * sqrt(rc * rd) * re);
+		}
+
+		return aWeighting;
+	}
+
 	void processSignal()
 	{
-		int bands = 68;
 		float* dftData = new float[dftSize * numFrames];
-
-		std::vector<std::vector<float>> frames;
-
-		for (int i = 0; i < numFrames; i++) {
-			std::vector<float> frame;
-			for (int j = 0; j < dftSize; j++) {
-				frame.push_back(signal[i * dftSize + j]);
-			}
-			frames.push_back(frame);
-		}
 
 		FourierTransformMagnitude(signal, dftData, dftSize, numFrames);
 
 		float* nyquist = extractNyquistFrequencies(dftData);
 
+		std::vector<float> aWeighting = aWeight(halfDFTSize, sample_rate / 2);
+
+		for (int i = 0; i < numFrames; i++)
+		{
+			for (int j = 0; j < halfDFTSize; j++)
+			{
+				nyquist[i * halfDFTSize + j] *= aWeighting[j];
+			}
+		}
+
+		//Just Normalize Nyquist?
+
 		delete[] dftData;
 
 		std::cout << "Binning Frequencies" << std::endl;
 
-		std::vector<std::vector<float>> bandData = BinFrequencies(nyquist, halfDFTSize, numFrames, bands, sample_rate);
+		std::vector<std::vector<float>> bandData = BinFrequencies(nyquist, halfDFTSize, numFrames, bands, sample_rate/2);
 
 		bandData = ApplyDRC(bandData);
 
@@ -310,7 +358,7 @@ public:
 			std::vector<float> frame(bands);
 			for (int j = 0; j < bands; j++)
 			{
-				frame[j] = normalizedBandData[j][i];
+				frame[j] = ExpScaling(normalizedBandData[j][i]);
 			}
 
 			//rotatedNormalizedBandData[i] = normalize(frame);
@@ -323,7 +371,7 @@ public:
 
 		std::cout << "Finished Binning Frequencies" << std::endl;
 
-		std::vector<std::vector<float>> convolvedBands = smoothData(bandData, bands);
+		std::vector<std::vector<float>> convolvedBands = smoothData(rotatedNormalizedBandData, bands);
 
 		std::cout << "Generating frames" << std::endl;
 
@@ -331,6 +379,11 @@ public:
 		{
 			generateFrame(i, convolvedBands[i]);
 		}
+	}
+
+	float ExpScaling(float magnitude, float alpha = 0.5)
+	{
+		return exp(alpha * magnitude) - 1;
 	}
 
 	std::vector<std::vector<float>> ApplyDRC(std::vector<std::vector<float>> bandData)
@@ -343,7 +396,7 @@ public:
 
 			for (int j = 0; j < bandData[i].size(); j++)
 			{
-				drcBandData[i][j] = DRC(bandData[i][j], 0.75, 1.0);
+				drcBandData[i][j] = DRC(bandData[i][j], 0.6, 1.0);
 			}
 		}
 
@@ -419,9 +472,9 @@ public:
 		int imageHeight = 1080;
 
 		int numBars = bars.size();
-		int spacing = 10;
+		int spacing = 8;
 
-		int barWidth = (imageWidth - (spacing * (numBars + 1))) / numBars;
+		int barWidth = (imageWidth - (spacing * (numBars))) / numBars;
 
 		RectInfo* rects = new RectInfo[numBars];
 
