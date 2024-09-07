@@ -284,6 +284,8 @@ public:
 
 		std::vector<std::vector<float>> bandData = BinFrequencies(nyquist, halfDFTSize, numFrames, bands, sample_rate);
 
+		bandData = ApplyDRC(bandData);
+
 		//Kinda Good for now
 		//Instead we will find the mean and the standard deviation of the bands
 		// The we scale from 0 to 2 STD from the mean, and then from there we normalize
@@ -312,7 +314,8 @@ public:
 			}
 
 			//rotatedNormalizedBandData[i] = normalize(frame);
-			rotatedNormalizedBandData[i] = normalizeGaus(frame);
+			//rotatedNormalizedBandData[i] = normalizeGaus(frame);
+			rotatedNormalizedBandData[i] = frame;
 		}
 
 		delete[] nyquist;
@@ -328,6 +331,28 @@ public:
 		{
 			generateFrame(i, convolvedBands[i]);
 		}
+	}
+
+	std::vector<std::vector<float>> ApplyDRC(std::vector<std::vector<float>> bandData)
+	{
+		std::vector<std::vector<float>> drcBandData(bandData.size());
+
+		for (int i = 0; i < bandData.size(); i++)
+		{
+			drcBandData[i] = std::vector<float>(bandData[i].size());
+
+			for (int j = 0; j < bandData[i].size(); j++)
+			{
+				drcBandData[i][j] = DRC(bandData[i][j], 0.75, 1.0);
+			}
+		}
+
+		return drcBandData;
+	}
+
+	float DRC(float magnitude, float compressionRatio, float gain)
+	{
+		return gain * pow(magnitude, compressionRatio);
 	}
 
 	std::vector<std::vector<float>> smoothData(std::vector<std::vector<float>> bandData, int bands)
