@@ -23,6 +23,18 @@ __device__ float* normalizeGaus(float* vector, int size)
 	return vector;
 }
 
+__device__ float getMean(float* vector, int size)
+{
+	float sum = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		sum += vector[i];
+	}
+
+	return sum / size;
+}
+
 __device__ float getMax(float* vector, int size)
 {
 	float max = 0;
@@ -51,38 +63,6 @@ __device__ float* normalize(float* vector, int size)
 
 	return vector;
 
-
-	/*float mean = getMean(vector, size);
-	float std = getStandardDeviation(vector, size);
-
-	float interval = mean + 1.7 * std;
-
-	if (std == 0)
-		std = 0.0001;
-
-	for (int i = 0; i < size; i++)
-	{
-		float value = vector[i];
-
-		if (value > interval)
-			value = interval;
-
-		vector[i] = (value) / (1.7 * std);
-	}
-
-	return vector;*/
-}
-
-__device__ float getMean(float* vector, int size)
-{
-	float sum = 0;
-
-	for (int i = 0; i < size; i++)
-	{
-		sum += vector[i];
-	}
-
-	return sum / size;
 }
 
 __device__ float getStandardDeviation(float* vector, int size)

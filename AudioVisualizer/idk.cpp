@@ -423,7 +423,7 @@ public:
 			}
 		}*/
 
-		
+
 
 		//Just Normalize the Entire Binned Frequencies? Then apply the fminf and 0.8 exo scaling
 
@@ -451,8 +451,8 @@ public:
 			for (int j = 0; j < bands; j++)
 			{
 				//frame[j] = fminf(ExpScaling(normalizedBandData[j][i], 0.5), 1); //Fminf and Exp at 0.8?
-				frame[j] = ExpScaling(normalizedBandData[j][i]); //Fminf and Exp at 0.8?
-				//frame[j] = normalizedBandData[j][i]; //Fminf and Exp at 0.8?
+				//frame[j] = ExpScaling(normalizedBandData[j][i], 0.5); //Fminf and Exp at 0.8?
+				frame[j] = normalizedBandData[j][i]; //Fminf and Exp at 0.8?
 			}
 
 			//rotatedNormalizedBandData[i] = normalize(frame);
@@ -461,6 +461,7 @@ public:
 		}
 
 		delete[] nyquist;
+		//delete[] logFreqs;
 
 		std::cout << "Finished Binning Frequencies" << std::endl;
 
@@ -489,7 +490,7 @@ public:
 
 			for (int j = 0; j < bandData[i].size(); j++)
 			{
-				drcBandData[i][j] = DRC(bandData[i][j], 0.6, 1.0);
+				drcBandData[i][j] = DRC(bandData[i][j], 0.4, 1.0);
 			}
 		}
 
