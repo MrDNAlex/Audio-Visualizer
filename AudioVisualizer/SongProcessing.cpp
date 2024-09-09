@@ -5,6 +5,8 @@
 #include <math.h>
 #include <array>
 #include <chrono>
+#include <algorithm>
+#include <numeric>
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "D:\NanoDNA Studios\Programming\Audio-Visualizer\AudioVisualizer\FourierTransform.cuh"
@@ -205,12 +207,26 @@ public:
 		return min;
 	}
 
-	std::vector<float> normalizeGaus(std::vector<float> vector)
+	std::vector<float> gaussianNormalization(const std::vector<float>& data) {
+		float sum = std::accumulate(data.begin(), data.end(), 0.0);
+		float mean = sum / data.size();
+
+		float sq_sum = std::inner_product(data.begin(), data.end(), data.begin(), 0.0);
+		float stdDev = std::sqrt(sq_sum / data.size() - mean * mean);
+
+		std::vector<float> normalizedData(data.size());
+		std::transform(data.begin(), data.end(), normalizedData.begin(),
+			[mean, stdDev](float value) { return (value) / stdDev; });
+
+		return normalizedData;
+	}
+
+	std::vector<float> normalizeGaus(std::vector<float> vector, float stdRange)
 	{
 		float mean = getMean(vector);
 		float std = getStandardDeviation(vector);
 
-		float interval = mean + 1.7 * std;
+		float interval = mean + stdRange * std;
 
 		if (std == 0)
 			std = 0.0001;
@@ -222,7 +238,7 @@ public:
 			if (value > interval)
 				value = interval;
 
-			vector[i] = (value) / (1.7 * std);
+			vector[i] = (value) / (stdRange * std);
 		}
 
 		return vector;
@@ -241,12 +257,12 @@ public:
 		return sqrtf(sum / size);
 	}
 
-	float* normalizeGausPntr(float* vector, int size)
+	float* normalizeGausPntr(float* vector, int size, float stdRange)
 	{
 		float mean = getMeanPntr(vector, size);
 		float std = getStandardDeviationPntr(vector, size);
 
-		float interval = mean + 1.7 * std;
+		float interval = mean + stdRange * std;
 
 		if (std == 0)
 			std = 0.0001;
@@ -258,7 +274,7 @@ public:
 			if (value > interval)
 				value = interval;
 
-			vector[i] = (value) / (1.7 * std);
+			vector[i] = (value) / (stdRange * std);
 		}
 
 		return vector;
@@ -278,15 +294,17 @@ public:
 
 	float* normalizePntr(float* vector, int size)
 	{
+		float* normalized = new float[size];
+
 		float max = getMaxPntr(vector, size);
 
 		if (max == 0)
 			max = 0.0001;
 
 		for (int i = 0; i < size; i++)
-			vector[i] = vector[i] / max;
+			normalized[i] = vector[i] / max;
 
-		return vector;
+		return normalized;
 	}
 
 	std::vector<float> normalize(std::vector<float> vector)
@@ -375,25 +393,27 @@ public:
 
 		float* nyquist = extractNyquistFrequencies(dftData);
 
-		std::vector<float> aWeighting = aWeight(halfDFTSize, sample_rate / 2);
+		//
 
-		/*for (int i = 0; i < numFrames; i++)
+		std::vector<float> aWeighting = aWeight(halfDFTSize, sample_rate);
+
+		for (int i = 0; i < numFrames; i++)
 		{
 			for (int j = 0; j < halfDFTSize; j++)
 			{
 				nyquist[i * halfDFTSize + j] *= aWeighting[j];
 			}
-		}*/
+		}
 
-		//nyquist = normalizeGausPntr(nyquist, numFrames * halfDFTSize);
+		nyquist = normalizeGausPntr(nyquist, numFrames * halfDFTSize, 2);
+
+		//nyquist = normalizePntr(nyquist, numFrames * halfDFTSize);
 
 		delete[] dftData;
 
 		std::cout << "Binning Frequencies" << std::endl;
 
 		std::vector<std::vector<float>> bandData = BinFrequencies(nyquist, halfDFTSize, numFrames, bands, sample_rate / 2);
-
-		bandData = ApplyDRC(bandData);
 
 		//for (int i = 0; i < numFrames; i++)
 		//{
@@ -413,7 +433,7 @@ public:
 			}
 		}
 
-		norm = normalizeGaus(norm);
+		norm = normalizeGaus(norm, 2);
 
 		for (int i = 0; i < numFrames; i++)
 		{
@@ -423,7 +443,7 @@ public:
 			}
 		}*/
 
-		
+		//bandData = ApplyDRC(bandData, 0.8); //0.7?
 
 		//Just Normalize the Entire Binned Frequencies? Then apply the fminf and 0.8 exo scaling
 
@@ -439,8 +459,8 @@ public:
 				band[j] = bandData[j][i];
 			}
 
-			normalizedBandData[i] = normalizeGaus(band);
-			//normalizedBandData[i] = band;
+			//normalizedBandData[i] = normalizeGaus(band, 2); //1.9
+			normalizedBandData[i] = band;
 		}
 
 		std::vector<std::vector<float>> rotatedNormalizedBandData(numFrames);
@@ -451,14 +471,16 @@ public:
 			for (int j = 0; j < bands; j++)
 			{
 				//frame[j] = fminf(ExpScaling(normalizedBandData[j][i], 0.5), 1); //Fminf and Exp at 0.8?
-				frame[j] = ExpScaling(normalizedBandData[j][i]); //Fminf and Exp at 0.8?
-				//frame[j] = normalizedBandData[j][i]; //Fminf and Exp at 0.8?
+				//frame[j] = ExpScaling(normalizedBandData[j][i], 0.8); //Fminf and Exp at 0.8?
+				frame[j] = normalizedBandData[j][i]; //Fminf and Exp at 0.8?
 			}
 
 			//rotatedNormalizedBandData[i] = normalize(frame);
 			//rotatedNormalizedBandData[i] = normalizeGaus(frame);
 			rotatedNormalizedBandData[i] = frame;
 		}
+
+		//rotatedNormalizedBandData = ApplyDRC(rotatedNormalizedBandData, 1.3);
 
 		delete[] nyquist;
 
@@ -479,7 +501,7 @@ public:
 		return exp(alpha * magnitude) - 1;
 	}
 
-	std::vector<std::vector<float>> ApplyDRC(std::vector<std::vector<float>> bandData)
+	std::vector<std::vector<float>> ApplyDRC(std::vector<std::vector<float>> bandData, float compressionRatio)
 	{
 		std::vector<std::vector<float>> drcBandData(bandData.size());
 
@@ -489,7 +511,7 @@ public:
 
 			for (int j = 0; j < bandData[i].size(); j++)
 			{
-				drcBandData[i][j] = DRC(bandData[i][j], 0.6, 1.0);
+				drcBandData[i][j] = DRC(bandData[i][j], compressionRatio, 1.0);
 			}
 		}
 
