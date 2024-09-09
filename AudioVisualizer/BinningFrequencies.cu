@@ -190,8 +190,8 @@ std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int ha
 		freqBins[i] = (float)i * sampleRate / halfDFTSize;
 	}
 
-	float start = log10(5); // Change to 5?
-	float stop = log10(freqBins[halfDFTSize - 1]); //20 000?
+	float start = log10(7.5); // Change to 5?
+	float stop = log10(5000); //20 000? //freqBins[halfDFTSize - 1]
 	float* logFreqs = logspacePtr(start, stop, numOfBands + 1);
 
 	int nyquistLength = halfDFTSize * numOfFrames;
@@ -232,6 +232,8 @@ std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int ha
 
 	cudaStatus = GetVariable(bandData, gpuBandData, sizeof(float), numOfBands * numOfFrames);
 
+	bandData = normalizeGausPntr(bandData, numOfBands * numOfFrames, 2);
+
 	std::vector<std::vector<float>> result;
 
 	for (int i = 0; i < numOfFrames; i++)
@@ -261,4 +263,80 @@ std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int ha
 	delete[] bandData;
 
 	return result;
+}
+
+float getMaxPntr(float* vector, int size)
+{
+	float max = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		if (vector[i] > max)
+			max = vector[i];
+	}
+
+	return max;
+}
+
+float* normalizePntr(float* vector, int size)
+{
+	float* normalized = new float[size];
+
+	float max = getMaxPntr(vector, size);
+
+	if (max == 0)
+		max = 0.0001;
+
+	for (int i = 0; i < size; i++)
+		normalized[i] = vector[i] / max;
+
+	return normalized;
+}
+
+float getStandardDeviationPntr(float* vector, int size)
+{
+	float mean = getMeanPntr(vector, size);
+	float sum = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		sum += pow(vector[i] - mean, 2);
+	}
+
+	return sqrtf(sum / size);
+}
+
+float* normalizeGausPntr(float* vector, int size, float stdRange)
+{
+	float mean = getMeanPntr(vector, size);
+	float std = getStandardDeviationPntr(vector, size);
+
+	float interval = mean + stdRange * std;
+
+	if (std == 0)
+		std = 0.0001;
+
+	for (int i = 0; i < size; i++)
+	{
+		float value = vector[i];
+
+		if (value > interval)
+			value = interval;
+
+		vector[i] = (value) / (stdRange * std);
+	}
+
+	return vector;
+}
+
+float getMeanPntr(float* vector, int size)
+{
+	float sum = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		sum += vector[i];
+	}
+
+	return sum / size;
 }

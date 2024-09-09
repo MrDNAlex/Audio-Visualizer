@@ -22,6 +22,16 @@ __global__ void BinFrequencie(int* gpuHalfDFTSize, int* gpuNumOfFrames, int* gpu
 
 std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int halfDFTSize, int numOfFrames, int numOfBands, int sampleRate);
 
+float getMaxPntr(float* vector, int size);
+
+float* normalizePntr(float* vector, int size);
+
+float getStandardDeviationPntr(float* vector, int size);
+
+float* normalizeGausPntr(float* vector, int size, float stdRange);
+
+float getMeanPntr(float* vector, int size);
+
 
 
 
