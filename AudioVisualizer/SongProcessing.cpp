@@ -40,7 +40,7 @@ public:
 	int signalLength;
 
 	int barHeight = 400;
-	int bands = 67;
+	int bands = 65;
 
 
 	//Audio file properties
@@ -508,8 +508,8 @@ public:
 		int inputHeight = bandData.size();
 		int inputWidth = bands;
 
-		int kernelWidth = 5;
-		int kernelHeight = 5;
+		int kernelWidth = 3;
+		int kernelHeight = 3;
 		int kernelSize = kernelWidth * kernelHeight;
 
 		int stepWidth = 1;
