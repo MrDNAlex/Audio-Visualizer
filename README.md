@@ -20,8 +20,12 @@ The Following are some of my favourite songs visualized using the program. Impro
 
 ## [Overkill by RIOT](https://www.youtube.com/watch?v=A8pOVirjGF0)
 
-https://github.com/user-attachments/assets/497779b4-a174-4b7c-8f94-325edbfce169
+https://github.com/user-attachments/assets/b024b91d-e0f5-4174-ae66-1a39c8c99be1
 
 ## [Superhuman by Slander](https://www.youtube.com/watch?v=-sHagClUhCI)
 
-https://github.com/user-attachments/assets/4aae9ea6-9b05-4d01-b059-9a0606535429
+https://github.com/user-attachments/assets/3854e6ae-85b3-4e81-829c-555028dc674d
+
+### Comparison with Original
+
+https://github.com/user-attachments/assets/e21d2ea1-8615-4f1c-8b76-b0c48448afdd
