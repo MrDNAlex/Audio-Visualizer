@@ -403,50 +403,11 @@ public:
 			}
 		}
 
-		//nyquist = normalizeGausPntr(nyquist, numFrames * halfDFTSize, 2);
-		//nyquist = normalizePntr(nyquist, numFrames * halfDFTSize);
-
-
 		delete[] dftData;
 
 		std::cout << "Binning Frequencies" << std::endl;
 
 		std::vector<std::vector<float>> bandData = BinFrequencies(nyquist, halfDFTSize, numFrames, bands, sample_rate / 2);
-
-		std::vector<std::vector<float>> normalizedBandData(bands);
-
-		//Lets just try to refind the settings for Spacing 2. That looked good IMO
-
-		//for (int i = 0; i < bands; i++)
-		//{
-		//	std::vector<float> band(numFrames);
-		//	for (int j = 0; j < numFrames; j++)
-		//	{
-		//		band[j] = bandData[j][i];
-		//	}
-
-		//	//normalizedBandData[i] = normalizeGaus(band, 2); //1.9
-		//	normalizedBandData[i] = band;
-		//}
-
-		//std::vector<std::vector<float>> rotatedNormalizedBandData(numFrames);
-
-		//for (int i = 0; i < numFrames; i++)
-		//{
-		//	std::vector<float> frame(bands);
-		//	for (int j = 0; j < bands; j++)
-		//	{
-		//		//frame[j] = fminf(ExpScaling(normalizedBandData[j][i], 0.5), 1); //Fminf and Exp at 0.8?
-		//		//frame[j] = ExpScaling(normalizedBandData[j][i], 0.8); //Fminf and Exp at 0.8?
-		//		frame[j] = normalizedBandData[j][i]; //Fminf and Exp at 0.8?
-		//	}
-
-		//	//rotatedNormalizedBandData[i] = normalize(frame);
-		//	//rotatedNormalizedBandData[i] = normalizeGaus(frame);
-		//	rotatedNormalizedBandData[i] = frame;
-		//}
-
-		//rotatedNormalizedBandData = ApplyDRC(rotatedNormalizedBandData, 1.3);
 
 		delete[] nyquist;
 
