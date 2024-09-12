@@ -191,7 +191,7 @@ std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int ha
 	}
 
 	float start = log10(7.5); // Change to 5?
-	float stop = log10(8000); //20 000? //freqBins[halfDFTSize - 1]
+	float stop = log10(8000); //20 000? //freqBins[halfDFTSize - 1] // 8000
 	float* logFreqs = logspacePtr(start, stop, numOfBands + 1);
 
 	int nyquistLength = halfDFTSize * numOfFrames;
