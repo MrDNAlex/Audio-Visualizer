@@ -42,7 +42,7 @@ public:
 	int signalLength;
 
 	int barHeight = 400;
-	int bands = 65;
+	int bands = 65; // 65
 
 
 	//Audio file properties
@@ -514,7 +514,7 @@ public:
 		int imageHeight = 1080;
 
 		int numBars = bars.size();
-		int spacing = 8;
+		int spacing = 8;//8
 
 		int barWidth = (imageWidth - (spacing * (numBars))) / numBars;
 

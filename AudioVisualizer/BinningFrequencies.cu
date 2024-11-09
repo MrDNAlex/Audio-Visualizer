@@ -190,7 +190,7 @@ std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int ha
 		freqBins[i] = (float)i * sampleRate / halfDFTSize;
 	}
 
-	float start = log10(7.5); // Change to 5?
+	float start = log10(7.5); // Change to 5? or 7.5
 	float stop = log10(8000); //20 000? //freqBins[halfDFTSize - 1] // 8000
 	float* logFreqs = logspacePtr(start, stop, numOfBands + 1);
 
@@ -213,6 +213,7 @@ std::vector<std::vector<float>> BinFrequencies(float* nyquistFrequencies, int ha
 	int blocks = getDeviveProperties().multiProcessorCount;
 	int totalThreads = blocks * threadsPerBlock;
 
+	//Assign Variables
 	cudaStatus = AssignVariable((void**)&gpuFFTSize, &halfDFTSize, sizeof(int));
 	cudaStatus = AssignVariable((void**)&gpuNumOfFrames, &numOfFrames, sizeof(int));
 	cudaStatus = AssignVariable((void**)&gpuNumOfBands, &numOfBands, sizeof(int));
