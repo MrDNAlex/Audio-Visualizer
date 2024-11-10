@@ -389,10 +389,15 @@ public:
 	{
 		float* dftData = new float[dftSize * numFrames];
 
-		FourierTransformMagnitude(signal, dftData, dftSize, numFrames);
+		float* nyquist = new float[halfDFTSize * numFrames];
 
-		float* nyquist = extractNyquistFrequencies(dftData);
+		NyquistFrequencyMag(signal, nyquist, dftSize, numFrames);
 
+		//FourierTransformMagnitude(signal, dftData, dftSize, numFrames);
+
+		//float* nyquist = extractNyquistFrequencies(dftData);
+
+		/*
 		std::vector<float> aWeighting = aWeight(halfDFTSize, sample_rate);
 
 		for (int i = 0; i < numFrames; i++)
@@ -402,7 +407,8 @@ public:
 				nyquist[i * halfDFTSize + j] *= aWeighting[j];
 			}
 		}
-
+		*/
+		
 		delete[] dftData;
 
 		std::cout << "Binning Frequencies" << std::endl;
