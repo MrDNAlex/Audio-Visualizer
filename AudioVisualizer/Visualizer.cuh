@@ -10,6 +10,10 @@
 #include "MemoryManagement.h"
 #include "ImageSavers.h"
 
+#include <math.h>
+#include <vector>
+#include <array>
+
 struct RectInfo
 {
 	//Top left Corner

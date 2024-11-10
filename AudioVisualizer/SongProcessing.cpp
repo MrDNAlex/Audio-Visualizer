@@ -387,7 +387,7 @@ public:
 
 	void processSignal()
 	{
-		float* dftData = new float[dftSize * numFrames];
+		//float* dftData = new float[dftSize * numFrames];
 
 		float* nyquist = new float[halfDFTSize * numFrames];
 
@@ -409,7 +409,7 @@ public:
 		}
 		*/
 		
-		delete[] dftData;
+		//delete[] dftData;
 
 		std::cout << "Binning Frequencies" << std::endl;
 

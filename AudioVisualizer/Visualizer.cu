@@ -1,44 +1,63 @@
 #include "Visualizer.cuh"
 
+
 __global__ void VisualizeFrameGPU(RectInfo* rects, int* numOfRects, int* width, int* height, unsigned char* frame)
 {
-	int xIndex = blockIdx.x * blockDim.x + threadIdx.x;
-	int yIndex = blockIdx.y * blockDim.y + threadIdx.y;
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
 
 	int N = *numOfRects;
 	int imgWidth = *width;
 	int imgHeight = *height;
+	int totalOps = imgWidth * imgHeight;
 
-	if (xIndex >= imgWidth || yIndex >= imgHeight) return;
-
-	bool drawn = false;
-
-	for (int i = 0; i < N; i++)
+	while (index < totalOps)
 	{
-		RectInfo rect = rects[i];
+		int xIndex = index % imgWidth;
+		int yIndex = index / imgWidth;
 
-		if (xIndex >= rect.xPos && xIndex < rect.xPos + rect.width && yIndex >= rect.yPos && yIndex < rect.yPos + rect.height)
+		bool drawn = false;
+
+		for (int i = 0; i < N; i++)
 		{
-			int index = (yIndex * imgWidth + xIndex) * 3;
+			RectInfo rect = rects[i];
+
+			if (xIndex >= rect.xPos && xIndex < rect.xPos + rect.width && yIndex >= rect.yPos && yIndex < rect.yPos + rect.height)
+			{
+				int indexPixel = (yIndex * imgWidth + xIndex) * 3;
+
+				//JPG = red, green, blue
+				frame[indexPixel] = rect.red; //Color the pixel
+				frame[indexPixel + 1] = rect.green; //Color the pixel
+				frame[indexPixel + 2] = rect.blue; //Color the pixel
+
+				drawn = true;
+				break;
+			}
+		}
+
+		if (!drawn)
+		{
+			int indexPixel = (yIndex * imgWidth + xIndex) * 3;
 
 			//JPG = red, green, blue
-			frame[index] = rect.red; //Color the pixel
-			frame[index + 1] = rect.green; //Color the pixel
-			frame[index + 2] = rect.blue; //Color the pixel
-
-			drawn = true;
+			frame[indexPixel] = 0; //Color the pixel
+			frame[indexPixel + 1] = 0; //Color the pixel
+			frame[indexPixel + 2] = 0; //Color the pixel
 		}
-	}
 
-	if (!drawn)
-	{
-		int index = (yIndex * imgWidth + xIndex) * 3;
+		index += blockDim.x * gridDim.x;
+	}	
+}
 
-		//JPG = red, green, blue
-		frame[index] = 0; //Color the pixel
-		frame[index + 1] = 0; //Color the pixel
-		frame[index + 2] = 0; //Color the pixel
-	}
+static cudaDeviceProp getDeviveProperties()
+{
+	int device;
+	cudaGetDevice(&device);
+
+	cudaDeviceProp prop;
+	cudaGetDeviceProperties(&prop, device);
+
+	return prop;
 }
 
 unsigned char* VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
@@ -46,6 +65,8 @@ unsigned char* VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
 	int width = 1920;
 	int height = 1080;
 	int frameSize = width * height * 3;
+	int threadsPerBlock = 1024;
+	int multiprocessorCount = getDeviveProperties().multiProcessorCount;
 
 	RectInfo* gpuRects = 0;
 	int* gpuNumOfRects = 0;
@@ -64,10 +85,7 @@ unsigned char* VisualizeFrame(RectInfo* rects, int numOfRects, int frameIndex)
 	cudaStatus = AssignVariable((void**)&gpuRects, rects, sizeof(RectInfo), numOfRects);
 	cudaStatus = AssignMemory((void**)&gpuFrame, sizeof(unsigned char), frameSize);
 
-	dim3 threadsPerBlock(16, 16);
-	dim3 numBlocks(width / threadsPerBlock.x, height / threadsPerBlock.y);
-
-	VisualizeFrameGPU << <numBlocks, threadsPerBlock >> > (gpuRects, gpuNumOfRects, gpuWidth, gpuHeight, gpuFrame);
+	VisualizeFrameGPU << <multiprocessorCount, threadsPerBlock >> > (gpuRects, gpuNumOfRects, gpuWidth, gpuHeight, gpuFrame);
 
 	cudaStatus = cudaDeviceSynchronize();
 

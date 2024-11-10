@@ -59,6 +59,8 @@ void convertAudio(char* audioPath[])
 
 int main(int argc, char* argv[])
 {
+	auto start = std::chrono::high_resolution_clock::now();
+
 	debugCLI(argc, argv);
 
 	sprintf(audioPath, argv[1]);
@@ -103,6 +105,13 @@ int main(int argc, char* argv[])
 	clearScreen();
 
 	system("rm -r AudioVisualizerCache\\Frames");
+
+	auto end = std::chrono::high_resolution_clock::now();
+
+	// Calculate duration in microseconds
+	auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
+
+	std::cout << "Time taken by function: " << duration << " seconds" << std::endl;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
