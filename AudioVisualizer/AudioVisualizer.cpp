@@ -12,7 +12,6 @@
 #include "device_launch_parameters.h"
 #include "SongProcessing.cpp"
 
-
 char audioPath[1000];
 
 void clearScreen()
